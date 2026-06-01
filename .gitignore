@@ -1,2 +1,5 @@
 .env
-backend/migrations/__pycache__/env.cpython-314.pyc
+
+# Ignoring all python bytecode across the project
+__pycache__/
+*.pyc
