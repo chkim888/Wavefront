@@ -4,7 +4,7 @@ from uuid import UUID
 from datetime import datetime
 
 ## Experiments
-class Experiment(BaseModel):
+class ExperimentBase(BaseModel):
     project_id: UUID
     title: str
     description: str
@@ -14,33 +14,33 @@ class Experiment(BaseModel):
     start_time: datetime
     end_time: Optional[datetime]
 
-class ExperimentResponse(Experiment):
+class ExperimentResponse(ExperimentBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
 ## Assignments
-class Assignment(BaseModel):
+class AssignmentBase(BaseModel):
     session_id: str
     experiment_id: UUID
     variant: Literal['control', 'treatment']
 
-class AssignmentResponse(Assignment):
+class AssignmentResponse(AssignmentBase):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
 ## Events
-class Event(BaseModel):
+class EventBase(BaseModel):
     session_id: str
     experiment_id: UUID
     happened_at: datetime
     event_type: str
 
-class EventResponse(Event):
+class EventResponse(EventBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
 ## Results
-class Result(BaseModel):
+class ResultBase(BaseModel):
     experiment_id: UUID
     control_conversions: Optional[int]
     treatment_conversions: Optional[int]
@@ -50,5 +50,5 @@ class Result(BaseModel):
     confidence: Optional[float]
     winner: Optional[str]
 
-class ResultResponse(Result):
+class ResultResponse(ResultBase):
     model_config = ConfigDict(from_attributes=True)

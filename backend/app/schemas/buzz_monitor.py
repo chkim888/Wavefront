@@ -4,34 +4,34 @@ from uuid import UUID
 from datetime import datetime
 
 ## Topics
-class Topic(BaseModel):
+class TopicBase(BaseModel):
     title: str
     description: str
     project_id: UUID
 
-class TopicResponse(Topic):
+class TopicResponse(TopicBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
 ## Keywords
-class Keyword(BaseModel):
+class KeywordBase(BaseModel):
     topic_id: UUID
     keyword: str
 
-class KeywordResponse(Keyword):
+class KeywordResponse(KeywordBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
 ## Platforms
-class Platform(BaseModel):
+class PlatformBase(BaseModel):
     name: str
 
-class PlatformResponse(Platform):
+class PlatformResponse(PlatformBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
 ## Posts
-class Post(BaseModel):
+class PostBase(BaseModel):
     topic_id: UUID
     platform_id: UUID
     original_poster: str
@@ -39,11 +39,11 @@ class Post(BaseModel):
     content_type: Literal['post', 'comment', 'video']
     content: str
 
-class PostSentimentUpdate(Post):
+class PostSentimentUpdate(PostBase):
     sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
     sentiment_score: Optional[float]
 
-class PostResponse(Post):
+class PostResponse(PostBase):
     id: UUID
     sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
     sentiment_score: Optional[float]
