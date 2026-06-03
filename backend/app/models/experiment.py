@@ -1,15 +1,15 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import ForeignKey, CheckConstraint
+from sqlalchemy import ForeignKey, CheckConstraint, UUID
 from typing import Optional
-from uuid import UUID, uuid4
+from uuid import UUID as PyUUID, uuid4
 from datetime import datetime
 from app.database import Base
 
 class Experiment(Base):
     __tablename__ = "experiments"
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
-    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"))
+    id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"))
     title: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
     curr_status: Mapped[str] = mapped_column(
@@ -27,7 +27,7 @@ class Assignment(Base):
     __tablename__ = "assignments"
 
     session_id: Mapped[str] = mapped_column(primary_key=True)
-    experiment_id: Mapped[UUID] = mapped_column(
+    experiment_id: Mapped[PyUUID] = mapped_column(
         ForeignKey("experiments.id"), 
         primary_key=True
     )
@@ -42,16 +42,16 @@ class Assignment(Base):
 class Event(Base):
     __tablename__ = "events"
 
-    id: Mapped[UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid4)
+    id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     session_id: Mapped[str] = mapped_column()
-    experiment_id: Mapped[UUID] = mapped_column(ForeignKey("experiments.id"))
+    experiment_id: Mapped[PyUUID] = mapped_column(ForeignKey("experiments.id"))
     happened_at: Mapped[datetime] = mapped_column()
     event_type: Mapped[str] = mapped_column()
 
 class Results(Base):
     __tablename__ = "results"
 
-    experiment_id: Mapped[UUID] = mapped_column(ForeignKey("experiments.id"), primary_key=True)
+    experiment_id: Mapped[PyUUID] = mapped_column(ForeignKey("experiments.id"), primary_key=True)
     control_conversions: Mapped[int] = mapped_column()
     treatment_conversions: Mapped[int] = mapped_column()
     control_rate: Mapped[float] = mapped_column()

@@ -31,7 +31,7 @@ def register(user: UserCreate, db_session = Depends(get_db_session)):
         new_user = User(
             username=user.username, 
             email=user.email, 
-            password=hashed_password.decode('utf-8'))
+            password_hash=hashed_password.decode('utf-8'))
         db_session.add(new_user)     # staging the created user to be added 
         db_session.commit()          # committing staged changes (i.e. adding new user)
         db_session.refresh(new_user) # syncing new user object with new database values
@@ -50,7 +50,7 @@ def login(user: UserCreate, db_session = Depends(get_db_session)):
         )
     if not bcrypt.checkpw( # extracts salt automatically when hashing
         user.password.encode('utf-8'),
-        db_user.password.encode('utf-8')
+        db_user.password_hash.encode('utf-8')
     ): # matching username found but password doesn't match
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
