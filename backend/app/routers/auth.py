@@ -4,6 +4,7 @@ import bcrypt
 from app.schemas.user import UserCreate, UserResponse
 from app.models.user import User
 from app.database import get_db_session
+from app.auth.jwt import create_access_token
 
 
 # Create an API router to facilitate connections
@@ -47,7 +48,7 @@ def login(user: UserCreate, db_session = Depends(get_db_session)):
             status_code=status.HTTP_404_NOT_FOUND,
             detail="No user with a matching username found"
         )
-    if not bcrypt.checkpw(
+    if not bcrypt.checkpw( # extracts salt automatically when hashing
         user.password.encode('utf-8'),
         db_user.password.encode('utf-8')
     ): # matching username found but password doesn't match
@@ -56,7 +57,7 @@ def login(user: UserCreate, db_session = Depends(get_db_session)):
             detail="User password does not match the record"
         )
     
-    # user validation successful
-    return {"message": "login successful"}
+    # user validation successful -- return JWT
+    return {"access_token": create_access_token(db_user.id), "token_type": "bearer"}
 
 
