@@ -11,12 +11,21 @@ class ExperimentBase(BaseModel):
     curr_status: Literal['created', 'running', 'complete', 'archived']
     traffic_split: int
     success_metric: str
-    start_time: datetime
-    end_time: Optional[datetime]
 
 class ExperimentResponse(ExperimentBase):
     id: UUID
+    start_time: Optional[datetime]
+    end_time: Optional[datetime]
     model_config = ConfigDict(from_attributes=True)
+
+class ExperimentUpdate(ExperimentBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
+    curr_status: Optional[Literal['created', 'running', 'complete', 'archived']] = None
+    traffic_split: Optional[int] = None
+    success_metric: Optional[str] = None
+    start_time: Optional[datetime] = None
+    end_time: Optional[datetime] = None
 
 ## Assignments
 class AssignmentBase(BaseModel):

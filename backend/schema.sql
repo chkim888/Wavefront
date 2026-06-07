@@ -91,7 +91,7 @@ CREATE TABLE experiments ( -- experiments for A/B testing
 	curr_status VARCHAR(50) NOT NULL CHECK (curr_status IN ('created', 'running', 'complete', 'archived')),
 	traffic_split INTEGER NOT NULL, -- store the side for treatment
 	success_metric VARCHAR(50) NOT NULL, -- determine at app level & save info here (i.e. button click)
-	start_time TIMESTAMP NOT NULL,
+	start_time TIMESTAMP,
 	end_time TIMESTAMP,
 	
 	-- FOREIGN KEYS

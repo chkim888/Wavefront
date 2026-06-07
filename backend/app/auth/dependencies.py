@@ -1,7 +1,8 @@
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
+from sqlalchemy import select, and_
 from fastapi import HTTPException, status, Depends
-from app.models.user import User
+from uuid import UUID
+from app.models.user import User, User_Project
 from app.auth.jwt import verify_token
 from app.database import get_db_session
 
@@ -25,3 +26,16 @@ def get_current_user(token: str=Depends(oauth2_scheme), db=Depends(get_db_sessio
             detail="user not found"
         )
     return db_user
+
+# Determine whether user has owner access 
+def permission_check(user_id: UUID, project_id: UUID, db_session):
+    user_role = db_session.scalars( # Get user role for the project (if exists)
+        select(User_Project.role).where(and_(
+            user_id == User_Project.user_id, 
+            project_id == User_Project.project_id))).first()
+    if not user_role: # User is not an owner / not a part of the project
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User is not authorized for the project"
+        )
+    return user_role

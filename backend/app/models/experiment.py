@@ -48,7 +48,7 @@ class Event(Base):
     happened_at: Mapped[datetime] = mapped_column()
     event_type: Mapped[str] = mapped_column()
 
-class Results(Base):
+class Result(Base):
     __tablename__ = "results"
 
     experiment_id: Mapped[PyUUID] = mapped_column(ForeignKey("experiments.id"), primary_key=True)

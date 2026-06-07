@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_
 from uuid import UUID
-from app.auth.dependencies import get_current_user
+from app.auth.dependencies import get_current_user, permission_check
 from app.database import get_db_session
 from app.schemas.buzz_monitor import TopicBase, TopicResponse, TopicUpdate, KeywordBase, KeywordResponse, PostBase, PostSentimentUpdate, PostSentimentResponse, PostResponse, PlatformResponse
 from app.models.user import User_Project
@@ -9,30 +9,16 @@ from app.models.buzz_monitor import Topic, Keyword, Post, Platform
 
 # Constant initialization
 OWNER = "owner"
+VIEWER = "viewer"
 
 # Router initialization
 router = APIRouter(prefix="/topics")
-
-# Helper functions
-# Determine whether user has owner access 
-def permission_check(user_id: UUID, project_id: UUID, db_session):
-    user_role = db_session.scalars( # Get user role for the project (if exists)
-        select(User_Project.role).where(and_(
-            user_id == User_Project.user_id, 
-            project_id == User_Project.project_id))).first()
-    if user_role == OWNER: # User is an owner of the project
-        return True
-    else: # User is not an owner / not a part of the project
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="User is not authorized for the project"
-        )
 
 ## Create
 # Create new topic (for a project)
 @router.post("/", response_model=TopicResponse)
 def create_topic(topic: TopicBase, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    if permission_check(user.id, topic.project_id, db_session):
+    if permission_check(user.id, topic.project_id, db_session) == OWNER:
         new_topic = Topic(
             title=topic.title,
             description=topic.description,
@@ -46,7 +32,7 @@ def create_topic(topic: TopicBase, user=Depends(get_current_user), db_session=De
 # Create new keyword for a topic (for a topic)
 @router.post("/keyword", response_model=KeywordResponse)
 def create_keyword(keyword: KeywordBase, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    if permission_check(user.id, keyword.project_id, db_session):
+    if permission_check(user.id, keyword.project_id, db_session) == OWNER:
         new_keyword = Keyword(
             topic_id=keyword.topic_id,
             keyword=keyword.keyword
@@ -75,7 +61,7 @@ def get_platforms(db_session=Depends(get_db_session)):
 def get_keywords(topic_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     project_id = db_session.scalars(select(Topic.project_id).where(Topic.id == topic_id)).first()
     if project_id:
-        if permission_check(user.id, project_id, db_session):
+        if permission_check(user.id, project_id, db_session) in [OWNER, VIEWER]:
             keywords = db_session.scalars(
                 select(Keyword).where(Keyword.topic_id == topic_id)
             ).all()
@@ -91,7 +77,7 @@ def get_keywords(topic_id: UUID, user=Depends(get_current_user), db_session=Depe
 def get_posts_for_topic(topic_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     project_id = db_session.scalars(select(Topic.project_id).where(Topic.id == topic_id)).first()
     if project_id:
-        if permission_check(user.id, project_id, db_session):
+        if permission_check(user.id, project_id, db_session) in [OWNER, VIEWER]:
             posts = db_session.execute(
                 select(Post).where(Post.topic_id == topic_id)
             ).all()
@@ -105,7 +91,7 @@ def get_posts_for_topic(topic_id: UUID, user=Depends(get_current_user), db_sessi
 # Read list of topics for a project
 @router.get("/{project_id}", response_model=list[TopicResponse])
 def get_topics(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    if permission_check(user.id, project_id, db_session):
+    if permission_check(user.id, project_id, db_session) in [OWNER, VIEWER]:
         topics = db_session.scalars(
             select(Topic).where(Topic.project_id == project_id)
         ).all()
@@ -115,7 +101,7 @@ def get_topics(project_id: UUID, user=Depends(get_current_user), db_session=Depe
 # Update topic title and/or description
 @router.patch("/", response_model=TopicResponse)
 def update_topic(updates: TopicUpdate, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    if permission_check(user.id, updates.project_id, db_session):
+    if permission_check(user.id, updates.project_id, db_session) == OWNER:
         topic = db_session.scalars(select(Topic).where(Topic.id == updates.id)).first()
         if updates.title:
             # Check if topic already exists with the same name/title
@@ -145,7 +131,7 @@ def update_topic(updates: TopicUpdate, user=Depends(get_current_user), db_sessio
 def update_post_sentiment(sentiment: PostSentimentUpdate, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     post = db_session.scalars(select(Post).where(Post.id == sentiment.id)).first()
     if post:
-        if permission_check(user.id, post.project_id, db_session):
+        if permission_check(user.id, post.project_id, db_session) == OWNER:
             if sentiment.sentiment_label:
                 post.sentiment_label = sentiment.sentiment_label
             if sentiment.sentiment_score:
@@ -165,7 +151,7 @@ def update_post_sentiment(sentiment: PostSentimentUpdate, user=Depends(get_curre
 def delete_keyword(keyword_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     keyword = db_session.scalars(select(Keyword).where(Keyword.id == keyword_id)).first()
     if keyword:
-        if permission_check(user.id, keyword.project_id, db_session):
+        if permission_check(user.id, keyword.project_id, db_session) == OWNER:
             db_session.delete(keyword)
             db_session.commit()
     else:
@@ -179,7 +165,7 @@ def delete_keyword(keyword_id: UUID, user=Depends(get_current_user), db_session=
 def delete_post(post_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     post = db_session.scalars(select(Post).where(Post.id == post_id)).first()
     if post:
-        if permission_check(user.id, post.project_id, db_session):
+        if permission_check(user.id, post.project_id, db_session) == OWNER:
             db_session.delete(post)
             db_session.commit()
     else:
@@ -193,7 +179,7 @@ def delete_post(post_id: UUID, user=Depends(get_current_user), db_session=Depend
 def delete_topic(topic_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     topic = db_session.scalars(select(Topic).where(Topic.id == topic_id)).first()
     if topic:
-        if permission_check(user.id, topic.project_id, db_session):
+        if permission_check(user.id, topic.project_id, db_session) == OWNER:
             db_session.delete(topic)
             db_session.commit()
     else:
