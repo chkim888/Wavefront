@@ -26,6 +26,16 @@ class ProjectResponse(ProjectBase):
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+class ProjectResponseWithRole(ProjectBase):
+    id: UUID
+    created_at: datetime
+    role: Literal['owner', 'viewer']
+    model_config = ConfigDict(from_attributes=True)
+
+class ProjectUpdate(ProjectBase):
+    name: Optional[str] = None 
+    description: Optional[str] = None
+
 ## Users_Projects
 class UsersProjectsBase(BaseModel):
     user_id: UUID
