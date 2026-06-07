@@ -38,6 +38,7 @@ CREATE TABLE topics ( -- monitored topics (i.e. media type)
 CREATE TABLE keywords (
 	id UUID PRIMARY KEY,
 	topic_id UUID NOT NULL,
+	project_id UUID NOT NULL,
 	keyword VARCHAR(255) NOT NULL,
 	UNIQUE (topic_id, keyword),
 	
@@ -45,18 +46,25 @@ CREATE TABLE keywords (
 	CONSTRAINT fk_keywords_topic
 		FOREIGN KEY (topic_id)
 		REFERENCES topics(id)
+		ON DELETE CASCADE,
+	
+	CONSTRAINT fk_keywords_project_id
+		FOREIGN KEY (project_id)
+		REFERENCES projects(id)
 		ON DELETE CASCADE
 );
 
 CREATE TABLE platforms (
 	id UUID PRIMARY KEY,
-	name VARCHAR(255) NOT NULL
+	name VARCHAR(255) NOT NULL,
+	api VARCHAR(255) NOT NULL
 	-- add more API information 
 );
 
 CREATE TABLE posts ( -- streamlined event data
 	id UUID PRIMARY KEY,
 	topic_id UUID NOT NULL,
+	project_id UUID NOT NULL,
 	platform_id UUID NOT NULL, -- name of the platform (i.e. reddit, twitter)
 	original_poster VARCHAR(255) NOT NULL, -- ID of person who posted the content
 	posted_time TIMESTAMP NOT NULL, -- time of posting
@@ -67,6 +75,7 @@ CREATE TABLE posts ( -- streamlined event data
 
 	-- Foreign keys
 	FOREIGN KEY (topic_id) REFERENCES topics(id),
+	FOREIGN KEY (project_id) REFERENCES projects(id),
 	
 	CONSTRAINT fk_posts_platform
 		FOREIGN KEY (platform_id)

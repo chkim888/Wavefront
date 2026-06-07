@@ -13,9 +13,14 @@ class TopicResponse(TopicBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
 
+class TopicUpdate(TopicBase):
+    title: Optional[str] = None
+    description: Optional[str] = None
+
 ## Keywords
 class KeywordBase(BaseModel):
     topic_id: UUID
+    project_id: UUID
     keyword: str
 
 class KeywordResponse(KeywordBase):
@@ -33,17 +38,22 @@ class PlatformResponse(PlatformBase):
 ## Posts
 class PostBase(BaseModel):
     topic_id: UUID
+    project_id: UUID
     platform_id: UUID
     original_poster: str
     posted_time: datetime
     content_type: Literal['post', 'comment', 'video']
     content: str
 
+class PostResponse(PostBase):
+    id: UUID
+    model_config = ConfigDict(from_attributes=True)
+
 class PostSentimentUpdate(PostBase):
     sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
     sentiment_score: Optional[float]
 
-class PostResponse(PostBase):
+class PostSentimentResponse(PostBase):
     id: UUID
     sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
     sentiment_score: Optional[float]

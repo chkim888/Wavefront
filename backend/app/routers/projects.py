@@ -126,7 +126,27 @@ def update_project(project_id: UUID, update_info: ProjectUpdate, user=Depends(ge
     user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))    
     if OWNER == db_session.scalars(user_role).first():
         project = db_session.scalars(select(Project).where(Project.id == project_id)).first()
+        if not project:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project not found"
+            )
         if update_info.name:
+            # Check if project already exists with the same name
+            all_user_projects = db_session.scalars(
+                select(User_Project.project_id).where(User_Project.user_id == user.id)
+            ).all()
+            existing = db_session.scalars(
+                select(Project).where(
+                    and_(Project.name == update_info.name,
+                         Project.id.in_(all_user_projects))
+                )
+            ).first()
+            if existing:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Project with the same name already in use"
+                )
             project.name = update_info.name
         if update_info.description:
             project.description = update_info.description

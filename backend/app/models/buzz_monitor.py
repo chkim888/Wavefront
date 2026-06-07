@@ -18,6 +18,7 @@ class Keyword(Base):
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.project_id"))
     keyword: Mapped[str] = mapped_column()
 
     __table_args__ = (
@@ -29,12 +30,14 @@ class Platform(Base):
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
+    api: Mapped[str] = mapped_column()
 
 class Post(Base):
     __tablename__ = "posts"
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.project_id"))
     platform_id: Mapped[PyUUID] = mapped_column(ForeignKey("platforms.id"))
     original_poster: Mapped[str] = mapped_column()
     posted_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
