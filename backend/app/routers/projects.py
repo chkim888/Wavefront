@@ -141,11 +141,12 @@ def update_project(project_id: UUID, update_info: ProjectUpdate, user=Depends(ge
     
 ## Delete
 # Delete project
-@router.delete("/project", status_code=status.HTTP_204_NO_CONTENT)
-def delete_project(project: Project, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+@router.delete("/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Check user permission (owner?)
-    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project.id))
+    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))
     if OWNER == db_session.scalars(user_role).first():
+        project = select(Project).where(Project.id == project_id)
         db_session.delete(project)
         db_session.commit()
     else:
@@ -155,10 +156,10 @@ def delete_project(project: Project, user=Depends(get_current_user), db_session=
         )
     
 # Delete user from project
-@router.delete("/role", status_code=status.HTTP_204_No_CONTENT)
-def delete_user_from_project(project: Project, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+@router.delete("/role/{project_id}", status_code=status.HTTP_204_No_CONTENT)
+def delete_user_from_project(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Check if user is in project
-    check_user = select(User_Project).where(and_(User_Project.user_id == user.id, User_Project.project_id == project.id))
+    check_user = select(User_Project).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))
     user_returned = db_session.scalars(check_user).first()
     if not user_returned:
         raise HTTPException(

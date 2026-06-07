@@ -59,5 +59,3 @@ def login(user: UserCreate, db_session = Depends(get_db_session)):
     
     # user validation successful -- return JWT
     return {"access_token": create_access_token(db_user.id), "token_type": "bearer"}
-
-
