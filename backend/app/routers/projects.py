@@ -156,7 +156,7 @@ def delete_project(project_id: UUID, user=Depends(get_current_user), db_session=
         )
     
 # Delete user from project
-@router.delete("/role/{project_id}", status_code=status.HTTP_204_No_CONTENT)
+@router.delete("/role/{project_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user_from_project(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Check if user is in project
     check_user = select(User_Project).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))

@@ -16,6 +16,10 @@ class UserResponse(UserBase): # What user gets in return
     created_at: datetime
     model_config = ConfigDict(from_attributes=True)
 
+class UserUpdate(UserBase):
+    username: Optional[str] = None
+    email: Optional[str] = None
+
 ## Project
 class ProjectBase(BaseModel):
     name: str
