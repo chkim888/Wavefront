@@ -3,7 +3,7 @@ from sqlalchemy import select, and_
 from uuid import UUID
 from app.auth.dependencies import get_current_user, permission_check
 from app.database import get_db_session
-from app.schemas.buzz_monitor import TopicBase, TopicResponse, TopicUpdate, KeywordBase, KeywordResponse, PostBase, PostSentimentUpdate, PostSentimentResponse, PostResponse, PlatformResponse
+from app.schemas.buzz_monitor import TopicBase, TopicResponse, TopicUpdate, KeywordBase, KeywordResponse, PostBase, PostSentimentUpdate, PostSentimentResponse, PostResponse, PlatformResponse, PostCountsUpdate, PostCountsResponse
 from app.models.user import User_Project
 from app.models.buzz_monitor import Topic, Keyword, Post, Platform
 
@@ -125,6 +125,27 @@ def update_topic(updates: TopicUpdate, user=Depends(get_current_user), db_sessio
 # (updating keyword skipped -- just delete and/or add a new one)
 
 # Update platform information -- not sure if needed (same as create)
+
+# Update post counts
+@router.patch("/counts", response_model=PostCountsResponse)
+def update_post_counts(counts: PostCountsUpdate, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+    post = db_session.scalars(select(Post).where(Post.id == counts.id)).first()
+    if post:
+        if permission_check(user.id, post.project_id, db_session) == OWNER:
+            if counts.view_count:
+                post.view_count = counts.view_count
+            if counts.like_count:
+                post.like_count = counts.like_count
+            if counts.comment_count:
+                post.comment_count = counts.comment_count
+            db_session.commit()
+            db_session.refresh(post)
+            return post
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Post not found"
+        )
 
 # Update post sentiment label & score
 @router.patch("/sentiment", response_model=PostSentimentResponse)

@@ -43,5 +43,8 @@ class Post(Base):
     posted_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
     content_type: Mapped[str] = mapped_column(CheckConstraint("content_type IN ('post', 'comment', 'video')", name="check_valid_content_type"))
     content: Mapped[str] = mapped_column()
+    view_count: Mapped[int] = mapped_column()
+    like_count: Mapped[int] = mapped_column()
+    comment_count: Mapped[int] = mapped_column()
     sentiment_label: Mapped[Optional[str]] = mapped_column(CheckConstraint("sentiment_label IN ('positive', 'negative', 'neutral')", name="check_valid_sentiment_label"))
     sentiment_score: Mapped[Optional[float]] = mapped_column()

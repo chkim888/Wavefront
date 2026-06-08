@@ -70,6 +70,9 @@ CREATE TABLE posts ( -- streamlined event data
 	posted_time TIMESTAMP NOT NULL, -- time of posting
 	content_type VARCHAR(255) NOT NULL CHECK (content_type IN ('post', 'comment', 'video')),
 	content TEXT NOT NULL,	-- raw content in text
+	view_count INTEGER,
+	like_count INTEGER,
+	comment_count INTEGER,
 	sentiment_label VARCHAR(50) CHECK (sentiment_label IN ('positive', 'negative', 'neutral')),
 	sentiment_score NUMERIC(4, 3),
 
