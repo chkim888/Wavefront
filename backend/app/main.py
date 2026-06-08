@@ -1,19 +1,15 @@
 from fastapi import FastAPI
-from app.routers.auth import router as auth_router
-from app.routers.users import router as users_router
-from app.routers.projects import router as projects_router
-from app.routers.topics import router as topics_router
-from app.routers.experiments import router as experiments_router
+from app.routers import auth, users, projects, topics, experiments
 
 # Initialize the main web app object -- this orchestrates the entire API
 app = FastAPI()
 
 ### routers
-app.include_router(auth_router)
-app.include_router(users_router)
-app.include_router(projects_router)
-app.include_router(topics_router)
-app.include_router(experiments_router)
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(projects.router)
+app.include_router(topics.router)
+app.include_router(experiments.router)
 
 # test endpoint -- just to see if things work
 @app.get("/")

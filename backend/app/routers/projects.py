@@ -19,7 +19,7 @@ def create_project(project: ProjectBase, user=Depends(get_current_user), db_sess
     # Check if there is already a project under the same name for the user
     duplicate_check = select(User_Project).where(
         and_(User_Project.user_id == user.id, 
-             User_Project.project_id == select(Project.id).where(Project.name == project.name)))
+             User_Project.project_id == select(Project.id).where(Project.name == project.name).scalar_subquery()))
     if (db_session.scalars(duplicate_check).first()):
         # return an error if there is a duplicate project
         raise HTTPException(
