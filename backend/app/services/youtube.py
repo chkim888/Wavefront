@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from app.models.buzz_monitor import Post
-from app.services.sentiment import run_sentiment_analysis
+from app.services.sentiment import sentiment_analysis
 
 # Load env variables
 load_dotenv()
@@ -58,7 +58,7 @@ def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)
         db_session.add(new_comment)
     db_session.commit()
     # Call function to run sentiment analysis on the ingested posts
-    run_sentiment_analysis(topic_id, project_id, db_session)
+    sentiment_analysis(topic_id, db_session)
 
 # Search videos associated with the keywords & return their IDs
 def search_videos(keywords: list[str], max_results: int = MAX_RESULTS):
