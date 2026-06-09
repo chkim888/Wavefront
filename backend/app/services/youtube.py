@@ -71,7 +71,7 @@ def get_video_comments(video_id: str, max_results: int = MAX_RESULTS):
     response = request.execute()
     # Create a dictionary for each response & append to result
     for data in response['items']:
-        comment = data["snippet"]["toplevelComment"]
+        comment = data["snippet"]["topLevelComment"]
         new_metadata = dict(
             original_poster=comment["snippet"]["authorDisplayName"],
             posted_time=comment["snippet"]["publishedAt"],
