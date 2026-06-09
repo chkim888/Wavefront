@@ -35,6 +35,7 @@ def create_keyword(keyword: KeywordBase, user=Depends(get_current_user), db_sess
     if permission_check(user.id, keyword.project_id, db_session) == OWNER:
         new_keyword = Keyword(
             topic_id=keyword.topic_id,
+            project_id=keyword.project_id,
             keyword=keyword.keyword
         )
         db_session.add(new_keyword)

@@ -1,6 +1,7 @@
 import os
 from dotenv import load_dotenv
 from googleapiclient import discovery
+from googleapiclient.errors import HttpError
 from app.models.buzz_monitor import Post
 
 # Load env variables
@@ -91,8 +92,11 @@ def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)
     metadata = get_video_metadata(video_ids)
     comments = list()
     for id in video_ids:
-        new_comments = get_video_comments(id)
-        comments += new_comments
+        try:
+            new_comments = get_video_comments(id)
+            comments += new_comments
+        except HttpError:
+            continue # Skip videos without comments
     # add data to the database
     # Add post metadata
     for post in metadata:

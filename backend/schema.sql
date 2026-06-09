@@ -56,9 +56,7 @@ CREATE TABLE keywords (
 
 CREATE TABLE platforms (
 	id UUID PRIMARY KEY,
-	name VARCHAR(255) NOT NULL,
-	api VARCHAR(255) NOT NULL
-	-- add more API information 
+	name VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE posts ( -- streamlined event data
