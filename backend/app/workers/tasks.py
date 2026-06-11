@@ -5,6 +5,7 @@ from app.services.sentiment import sentiment_analysis
 from app.services.spike_detection import spike_detection
 from app.database import SessionLocal
 from app.models.buzz_monitor import Topic, Project_Platform, Keyword
+from app.models.user import Project, User_Project
 
 # Fan-out pattern
 @app.task
@@ -23,6 +24,8 @@ def schedule_ingestion():
                 platform_dict[project_id] = db_session.scalars(
                     select(Project_Platform.platform_id).where(Project_Platform.project_id == project_id)).first()
             platform_id = platform_dict[project_id]
+            if not platform_id:
+                continue # skip if no platform
             keywords = db_session.scalars(select(Keyword.keyword).where(Keyword.topic_id == topic.id)).all()
             if keywords: # Ingestion task only if there are keywords for the topic
                 ingestion_task.delay(str(topic.id), str(project_id), str(platform_id), list(keywords)) # adding to queue
@@ -30,7 +33,7 @@ def schedule_ingestion():
         for topic in active_topics:
             sentiment_analysis_task.delay(str(topic.id))
         for topic in active_topics:
-            spike_detection_task.delay(str(topic.id), str(project_id))
+            spike_detection_task.delay(str(topic.id), str(topic.project_id))
     finally:
         db_session.close()
 
