@@ -3,7 +3,9 @@ from sqlalchemy import select, and_
 from uuid import UUID
 from app.auth.dependencies import get_current_user
 from app.schemas.user import ProjectBase, UsersProjectsBase, ProjectResponseWithRole, ProjectResponse, UsersProjectsResponse, ProjectUpdate
+from app.schemas.buzz_monitor import ProjectPlatformBase
 from app.models.user import Project, User_Project
+from app.models.buzz_monitor import Project_Platform
 from app.database import get_db_session
 
 # Variables
@@ -45,7 +47,36 @@ def create_project(project: ProjectBase, user=Depends(get_current_user), db_sess
         db_session.commit()
         db_session.refresh(new_role)
         return new_project
-    
+
+# Create a project-platform relation 
+@router.post("/platform/{platform_id}", response_model=ProjectPlatformBase)
+def post_project_platform(project: ProjectBase, platform_id: UUID, user=Depends(get_current_user), db_session = Depends(get_db_session)):
+    # Check if current user is an owner
+    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project.id))
+    if OWNER == db_session.scalars(user_role).first():
+        # check for duplicates
+        duplicate_check = db_session.scalars(
+            select(Project_Platform).where(and_(
+                Project_Platform.platform_id==platform_id,
+                Project_Platform.project_id==project.id
+            ))
+        ).first()
+        if duplicate_check:
+            raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Project platform relation already exists")
+        new_relation = Project_Platform(
+            project_id=project.id,
+            platform_id=platform_id
+        )
+        db_session.add(new_relation)
+        db_session.commit()
+        db_session.refresh(new_relation)
+        return new_relation
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User unauthorized to change project's platform setting"
+        )
+        
 # Assign a role for a user to a project
 @router.post("/role", response_model=UsersProjectsResponse)
 def assign_role(new_assignment: UsersProjectsBase, curr_user = Depends(get_current_user), db_session = Depends(get_db_session)):
@@ -189,3 +220,30 @@ def delete_user_from_project(project_id: UUID, user=Depends(get_current_user), d
     else:
         db_session.delete(user_returned)
         db_session.commit()
+
+# Delete project-platform relation
+@router.delete("/platform/{project_id}/{platform_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_project_platform(project_id: UUID, platform_id: UUID, user=Depends(get_current_user), db_session = Depends(get_db_session)):
+    # Check if current user is an owner
+    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))
+    if OWNER == db_session.scalars(user_role).first():
+        # Check if the relation exists
+        relation = db_session.scalars(
+            select(Project_Platform).where(and_(
+                Project_Platform.platform_id==platform_id,
+                Project_Platform.project_id==project_id
+            ))
+        ).first()
+        if relation:
+            db_session.delete(relation)
+            db_session.commit()
+        else:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Project and platform relation not found"
+            )
+    else:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User unauthorized to change project's platform setting"
+        )
