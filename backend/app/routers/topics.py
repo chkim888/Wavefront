@@ -4,7 +4,6 @@ from uuid import UUID
 from app.auth.dependencies import get_current_user, permission_check
 from app.database import get_db_session
 from app.schemas.buzz_monitor import TopicBase, TopicResponse, TopicUpdate, KeywordBase, KeywordResponse, PostBase, PostSentimentUpdate, PostSentimentResponse, PostResponse, PlatformResponse, PostCountsUpdate, PostCountsResponse
-from app.models.user import User_Project
 from app.models.buzz_monitor import Topic, Keyword, Post, Platform
 
 # Constant initialization

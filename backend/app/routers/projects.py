@@ -49,22 +49,22 @@ def create_project(project: ProjectBase, user=Depends(get_current_user), db_sess
         return new_project
 
 # Create a project-platform relation 
-@router.post("/platform/{platform_id}", response_model=ProjectPlatformBase)
-def post_project_platform(project: ProjectBase, platform_id: UUID, user=Depends(get_current_user), db_session = Depends(get_db_session)):
+@router.post("/platform/{project_id}/{platform_id}", response_model=ProjectPlatformBase)
+def post_project_platform(project_id: UUID, platform_id: UUID, user=Depends(get_current_user), db_session = Depends(get_db_session)):
     # Check if current user is an owner
-    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project.id))
+    user_role = select(User_Project.role).where(and_(User_Project.user_id == user.id, User_Project.project_id == project_id))
     if OWNER == db_session.scalars(user_role).first():
         # check for duplicates
         duplicate_check = db_session.scalars(
             select(Project_Platform).where(and_(
                 Project_Platform.platform_id==platform_id,
-                Project_Platform.project_id==project.id
+                Project_Platform.project_id==project_id
             ))
         ).first()
         if duplicate_check:
             raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Project platform relation already exists")
         new_relation = Project_Platform(
-            project_id=project.id,
+            project_id=project_id,
             platform_id=platform_id
         )
         db_session.add(new_relation)
