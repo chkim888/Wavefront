@@ -32,8 +32,12 @@ def fetch_posts(topic_id: UUID, db_session):
 
 # Clean up post content data
 def clean_post_data(content: str):
-    content = re.sub(r'http\S+', '', content)  # strip URLs
-    content = re.sub(r'@\w+', '', content)     # strip mentions
+    content = re.sub(r'http\S+', '', content)   # strip URLs
+    content = re.sub(r'@\w+', '', content)      # strip mentions
+    content = re.sub(r'#\w+', '', content)      # strip hashtags
+    content = re.sub(r'\n+', ' ', content)      # collapse newlines
+    content = re.sub(r' +', ' ', content)       # collapse spaces
+    content = content.lower()                   # lowercase
     return content[:512].strip()
 
 # Call the huggingface sentiment analysis pipeline & update posts
