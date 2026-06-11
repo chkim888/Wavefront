@@ -1,1 +1,1 @@
-I'm diligently working on it 🫡 Check back in late June for a complete project!
+I'm diligently working on it 🫡 Check back in early July for a complete project!
