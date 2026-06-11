@@ -75,3 +75,12 @@ class PostSentimentResponse(PostBase):
     sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
     sentiment_score: Optional[float]
     model_config = ConfigDict(from_attributes=True)
+
+class AlertBase(BaseModel):
+    project_id: UUID
+    topic_id: UUID
+    triggered_at: datetime
+    message: str
+
+class AlertResponse(AlertBase):
+    id: UUID

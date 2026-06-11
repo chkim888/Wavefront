@@ -43,7 +43,7 @@ class Post(Base):
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
-    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.project_id"))
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"))
     platform_id: Mapped[PyUUID] = mapped_column(ForeignKey("platforms.id"))
     original_poster: Mapped[str] = mapped_column()
     posted_time: Mapped[datetime] = mapped_column(DateTime(timezone=True))
@@ -54,3 +54,12 @@ class Post(Base):
     comment_count: Mapped[Optional[int]] = mapped_column()
     sentiment_label: Mapped[Optional[str]] = mapped_column(CheckConstraint("sentiment_label IN ('positive', 'negative', 'neutral')", name="check_valid_sentiment_label"))
     sentiment_score: Mapped[Optional[float]] = mapped_column()
+
+class Alert(Base):
+    __tablename__ = "alerts"
+
+    id: Mapped[PyUUID] = mapped_column(UUID, primary_key= True, default=uuid4)
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id")) 
+    topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
+    triggered_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    message: Mapped[str] = mapped_column()

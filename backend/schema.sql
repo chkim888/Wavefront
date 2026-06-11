@@ -93,6 +93,24 @@ CREATE TABLE posts ( -- streamlined event data
 		ON DELETE CASCADE	
 );
 
+CREATE TABLE alerts (
+	id UUID PRIMARY KEY,
+	project_id UUID NOT NULL,
+	topic_id UUID NOT NULL,
+	triggered_at TIMESTAMP NOT NULL,
+	message TEXT
+
+	CONSTRAINT fk_alerts_project
+		FOREIGN KEY (project_id) 
+		REFERENCES projects(id) 
+		ON DELETE CASCADE,
+	
+	CONSTRAINT fk_alerts_topic
+		FOREIGN KEY (topic_id) 
+		REFERENCES topics(id) 
+		ON DELETE CASCADE
+);
+
 CREATE TABLE experiments ( -- experiments for A/B testing
 	id UUID PRIMARY KEY,
 	project_id UUID NOT NULL,
