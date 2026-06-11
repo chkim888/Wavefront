@@ -30,5 +30,5 @@ class User_Project(Base):
     __tablename__ = "users_projects"
 
     user_id: Mapped[PyUUID] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    project_id: Mapped[UUID] = mapped_column(ForeignKey("projects.id"), primary_key=True)
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"), primary_key=True)
     role: Mapped[str] = mapped_column(CheckConstraint("role IN ('owner', 'viewer')", name="check_valid_role"))

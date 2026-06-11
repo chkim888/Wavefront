@@ -11,6 +11,7 @@ class Topic(Base):
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     title: Mapped[str] = mapped_column()
     description: Mapped[str] = mapped_column()
+    is_active: Mapped[bool] = mapped_column(default=True)
     project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"))
 
 class Keyword(Base):
@@ -30,6 +31,12 @@ class Platform(Base):
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     name: Mapped[str] = mapped_column()
+
+class Project_Platform(Base):
+    __tablename__ = "projects_platforms"
+
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"), primary_key=True)
+    platform_id: Mapped[PyUUID] = mapped_column(ForeignKey("platforms.id"), primary_key=True)
 
 class Post(Base):
     __tablename__ = "posts"

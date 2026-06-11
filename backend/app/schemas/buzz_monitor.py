@@ -7,6 +7,7 @@ from datetime import datetime
 class TopicBase(BaseModel):
     title: str
     description: str
+    is_active: bool
     project_id: UUID
 
 class TopicResponse(TopicBase):
@@ -34,6 +35,11 @@ class PlatformBase(BaseModel):
 class PlatformResponse(PlatformBase):
     id: UUID
     model_config = ConfigDict(from_attributes=True)
+
+## Projects_Platforms
+class ProjectPlatformBase(BaseModel):
+    project_id: UUID
+    platform_id: UUID
 
 ## Posts
 class PostBase(BaseModel):

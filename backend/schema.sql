@@ -26,6 +26,7 @@ CREATE TABLE topics ( -- monitored topics (i.e. media type)
 	id UUID PRIMARY KEY,
 	title VARCHAR(255) NOT NULL,
 	description TEXT NOT NULL,
+	is_active BOOLEAN DEFAULT TRUE, -- for buzz monitoring
 	project_id UUID NOT NULL, -- can belong to one project
 	
 	-- FOREIGN KEY
@@ -57,6 +58,14 @@ CREATE TABLE keywords (
 CREATE TABLE platforms (
 	id UUID PRIMARY KEY,
 	name VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE projects_platforms (
+	project_id UUID,
+	platform_id UUID,
+	PRIMARY KEY (project_id, platform_id),
+	FOREIGN KEY (project_id) REFERENCES projects(id),
+	FOREIGN KEY (platform_id) REFERENCES platform(id)
 );
 
 CREATE TABLE posts ( -- streamlined event data
