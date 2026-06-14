@@ -2,9 +2,7 @@ from sqlalchemy import select, func, and_
 import statistics
 from datetime import datetime, timezone, timedelta
 from app.models.buzz_monitor import Post, Alert
-
-# Constants
-HOURS = 24
+from app.constants import HOURS
 
 # Performs spike detection assessment on a given topic
 def spike_detection(topic_id: str, project_id: str, db_session) -> bool:
