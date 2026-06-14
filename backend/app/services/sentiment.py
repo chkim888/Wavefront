@@ -3,10 +3,7 @@ from uuid import UUID
 from sqlalchemy import select, and_, is_
 from transformers import pipeline
 from app.models.buzz_monitor import Post
-
-# Constants
-MODEL = "cardiffnlp/twitter-roberta-base-sentiment-latest"
-SENTIMENT_ANALYSIS = "sentiment-analysis"
+from app.constants import MODEL, SENTIMENT_ANALYSIS
 
 # Takes a topic & runs sentiment analysis on all associated posts
 def sentiment_analysis(topic_id, db_session):

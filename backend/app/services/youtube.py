@@ -5,13 +5,11 @@ from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from app.models.buzz_monitor import Post
 from app.services.sentiment import sentiment_analysis
+from app.constants import MAX_RESULTS
 
 # Load env variables
 load_dotenv()
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
-
-# Other constants
-MAX_RESULTS = 10
 
 # Ingest youtube data -- the whole process
 def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session):
