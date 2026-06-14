@@ -1,5 +1,6 @@
 from sqlalchemy import select
 from googleapiclient.errors import HttpError
+from celery import chain
 from app.workers.celery_app import app
 from app.services.youtube import ingest_youtube_data
 from app.services.sentiment import sentiment_analysis
@@ -29,12 +30,11 @@ def schedule_ingestion():
                 continue # skip if no platform
             keywords = db_session.scalars(select(Keyword.keyword).where(Keyword.topic_id == topic.id)).all()
             if keywords: # Ingestion task only if there are keywords for the topic
-                ingestion_task.delay(str(topic.id), str(project_id), str(platform_id), list(keywords)) # adding to queue
-        # After ingestion, run sentiment analysis and spike detection on each topic
-        for topic in active_topics:
-            sentiment_analysis_task.delay(str(topic.id))
-        for topic in active_topics:
-            spike_detection_task.delay(str(topic.id), str(topic.project_id))
+                chain(
+                    ingestion_task.s(str(topic.id), str(project_id), str(platform_id), list(keywords)), # adding to queue
+                    sentiment_analysis_task.si(str(topic.id)), # run sentiment analysis
+                    spike_detection_task.si(str(topic.id), str(topic.project_id)) # run spike detection
+                ).delay()
     finally:
         db_session.close()
 
