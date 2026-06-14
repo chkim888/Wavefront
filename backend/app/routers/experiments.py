@@ -1,15 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, and_
 from uuid import UUID
+from datetime import datetime, timezone
 from app.auth.dependencies import get_current_user, permission_check
 from app.database import get_db_session
 from app.schemas.experiment import ExperimentBase, ExperimentResponse, ExperimentUpdate, ResultResponse
 from app.models.experiment import Experiment, Result
 from app.models.user import User_Project
-
-# Constants
-OWNER = "owner"
-VIEWER = "viewer"
+from app.constants import OWNER, VIEWER, CREATED, RUNNING
 
 # Router initialization
 router = APIRouter(prefix="/experiments")
@@ -41,25 +39,51 @@ def create_experiment(experiment: ExperimentBase, user=Depends(get_current_user)
         db_session.commit()
         db_session.refresh(new_experiment)
         return new_experiment
+    
+# Start an experiment (already created)
+@router.post("/{experiment_id}/start", response_model=ExperimentResponse)
+def start_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+    # Fetch experiment details
+    experiment = db_session.scalars(
+        select(Experiment).where(Experiment.id == experiment_id)
+    ).first()
+    if not experiment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Experiment not found"
+        )
+    # Check user permission for project (ownership)
+    if permission_check(user.id, experiment.project_id, db_session) == OWNER:
+        # Check if the experiment hasn't been started yet
+        if experiment.curr_status != CREATED:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Experiment already started"
+            )
+        # Start experiment
+        experiment.curr_status = RUNNING
+        experiment.start_time = datetime.now(timezone.utc)
+        # Push changes
+        db_session.add(experiment)
+        db_session.commit()
+        db_session.refresh(experiment)
+        return experiment
 
 ## Read
 # Read experiments info
 @router.get("/project/{project_id}", response_model=list[ExperimentResponse])
-def get_experiment(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+def get_all_experiments(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     if permission_check(user.id, project_id, db_session) in [OWNER, VIEWER]:
         experiments = db_session.scalars(
             select(Experiment).where(Experiment.project_id == project_id)
         ).all()
         if not experiments:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Experiments not found"
-            )
+            experiments = [] # return an empty list if no experiments found for the project
         return experiments
 
 # Read one experiment info
 @router.get("/{experiment_id}", response_model=ExperimentResponse)
-def get_experiments(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+def get_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
     if experiment and permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
         return experiment
@@ -70,7 +94,7 @@ def get_experiments(experiment_id: UUID, user=Depends(get_current_user), db_sess
         )
 
 # Read result
-@router.get("/result/{experiment_id}", response_model=ResultResponse)
+@router.get("/{experiment_id}/result", response_model=ResultResponse)
 def get_result(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
     if experiment and permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
@@ -109,8 +133,6 @@ def update_experiment(experiment_id: UUID, updates: ExperimentUpdate, user=Depen
             experiment.title = updates.title
         if updates.description:
             experiment.description = updates.description
-        if updates.curr_status:
-            experiment.curr_status = updates.curr_status
         if updates.traffic_split:
             experiment.traffic_split = updates.traffic_split
         if updates.success_metric:

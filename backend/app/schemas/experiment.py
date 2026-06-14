@@ -21,7 +21,6 @@ class ExperimentResponse(ExperimentBase):
 class ExperimentUpdate(ExperimentBase):
     title: Optional[str] = None
     description: Optional[str] = None
-    curr_status: Optional[Literal['created', 'running', 'complete', 'archived']] = None
     traffic_split: Optional[int] = None
     success_metric: Optional[str] = None
     start_time: Optional[datetime] = None
@@ -42,6 +41,9 @@ class EventBase(BaseModel):
     session_id: str
     experiment_id: UUID
     happened_at: datetime
+    event_type: str
+
+class EventCreate(BaseModel):
     event_type: str
 
 class EventResponse(EventBase):
