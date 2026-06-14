@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import auth, users, projects, topics, experiments, ingest
+from app.routers import auth, users, projects, topics, experiments, ingest, assignments, events, flags
 
 # Initialize the main web app object -- this orchestrates the entire API
 app = FastAPI()
@@ -11,6 +11,9 @@ app.include_router(projects.router)
 app.include_router(topics.router)
 app.include_router(experiments.router)
 app.include_router(ingest.router)
+app.include_router(assignments.router)
+app.include_router(events.router)
+app.include_router(flags.router)
 
 # test endpoint -- just to see if things work
 @app.get("/")

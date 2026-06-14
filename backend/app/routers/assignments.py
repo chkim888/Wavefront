@@ -6,6 +6,7 @@ from app.database import get_db_session
 from app.schemas.experiment import AssignmentResponse
 from app.models.experiment import Assignment, Experiment
 from app.services.assignments import get_variant
+from app.services.assignments import get_or_assign_variant
 from app.constants import RUNNING
 
 # Router initialization
@@ -30,26 +31,5 @@ def assign_variant(experiment_id: UUID, session_id: str, db_session=Depends(get_
             status_code=status.HTTP_409_CONFLICT,
             detail="Experiment is not currently running, and assignment is not possible."
         )
-    # see if assignment already exists for the session -- return if exists
-    existing = db_session.scalars(
-        select(Assignment).where(and_(
-            Assignment.session_id == session_id,
-            Assignment.experiment_id == experiment_id
-    ))).first()
-    if existing:
-        return existing
-    # determine which variant the session is being assigned to
-    traffic_split = experiment.traffic_split
-    variant = get_variant(session_id, str(experiment_id), traffic_split)
-    # create a new assignment for the session
-    new_assignment = Assignment(
-        session_id=session_id,
-        experiment_id=experiment_id,
-        created_at=datetime.now(timezone.utc),
-        variant=variant
-    )
-    # Push new assignment & return
-    db_session.add(new_assignment)
-    db_session.commit()
-    db_session.refresh(new_assignment)
-    return new_assignment
+    assignment = get_or_assign_variant(session_id, experiment, db_session)
+    return assignment
