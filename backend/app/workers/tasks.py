@@ -31,7 +31,7 @@ def schedule_ingestion():
             keywords = db_session.scalars(select(Keyword.keyword).where(Keyword.topic_id == topic.id)).all()
             if keywords: # Ingestion task only if there are keywords for the topic
                 chain(
-                    ingestion_task.s(str(topic.id), str(project_id), str(platform_id), list(keywords)), # adding to queue
+                    ingestion_task.si(str(topic.id), str(project_id), str(platform_id), list(keywords)), # adding to queue
                     sentiment_analysis_task.si(str(topic.id)), # run sentiment analysis
                     spike_detection_task.si(str(topic.id), str(topic.project_id)) # run spike detection
                 ).delay()
