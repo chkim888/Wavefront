@@ -7,9 +7,7 @@ from app.schemas.buzz_monitor import ProjectPlatformBase
 from app.models.user import Project, User_Project
 from app.models.buzz_monitor import Project_Platform
 from app.database import get_db_session
-
-# Variables
-OWNER = "owner"
+from app.constants import OWNER
 
 # Router initialization
 router = APIRouter(prefix="/projects")
