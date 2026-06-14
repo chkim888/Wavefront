@@ -70,6 +70,7 @@ CREATE TABLE projects_platforms (
 
 CREATE TABLE posts ( -- streamlined event data
 	id UUID PRIMARY KEY,
+	external_id VARCHAR(255) NOT NULL,
 	topic_id UUID NOT NULL,
 	project_id UUID NOT NULL,
 	platform_id UUID NOT NULL, -- name of the platform (i.e. reddit, twitter)
@@ -86,6 +87,8 @@ CREATE TABLE posts ( -- streamlined event data
 	-- Foreign keys
 	FOREIGN KEY (topic_id) REFERENCES topics(id),
 	FOREIGN KEY (project_id) REFERENCES projects(id),
+
+	CONSTRAINT uq_platform_external UNIQUE (platform_id, external_id),
 	
 	CONSTRAINT fk_posts_platform
 		FOREIGN KEY (platform_id)

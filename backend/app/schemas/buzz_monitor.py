@@ -43,6 +43,7 @@ class ProjectPlatformBase(BaseModel):
 
 ## Posts
 class PostBase(BaseModel):
+    external_id: str
     topic_id: UUID
     project_id: UUID
     platform_id: UUID
