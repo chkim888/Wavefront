@@ -27,6 +27,11 @@ CREATED = "created"
 RUNNING = "running"
 COMPLETE = "complete"
 ARCHIVED = "archived"
+CONFIDENCE_THRESHOLD = 95
+
+# Results
+INCONCLUSIVE = "inconclusive"
+INSUFFICIENT_DATA = "insufficient data"
 
 # Assignments
 CONTROL = "control"

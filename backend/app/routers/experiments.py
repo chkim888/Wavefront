@@ -7,7 +7,8 @@ from app.database import get_db_session
 from app.schemas.experiment import ExperimentBase, ExperimentResponse, ExperimentUpdate, ResultResponse
 from app.models.experiment import Experiment, Result
 from app.models.user import User_Project
-from app.constants import OWNER, VIEWER, CREATED, RUNNING
+from app.services.stats_engine import run_stats_engine
+from app.constants import OWNER, VIEWER, CREATED, RUNNING, COMPLETE
 
 # Router initialization
 router = APIRouter(prefix="/experiments")
@@ -68,6 +69,48 @@ def start_experiment(experiment_id: UUID, user=Depends(get_current_user), db_ses
         db_session.commit()
         db_session.refresh(experiment)
         return experiment
+    
+# Stop experiment
+@router.post("/{experiment_id}/stop", response_model=ResultResponse)
+def stop_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+    # Fetch experiment details
+    experiment = db_session.scalars(
+        select(Experiment).where(Experiment.id == experiment_id)
+    ).first()
+    if not experiment:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Experiment not found"
+        )
+    # Check user permission for project (ownership)
+    if permission_check(user.id, experiment.project_id, db_session) == OWNER:
+        # Check if the experiment hasn't been started yet
+        if experiment.curr_status != RUNNING:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Experiment is not running"
+            )
+        # Check if result already exists
+        check_duplicate = db_session.scalars(
+            select(Result).where(Result.experiment_id==experiment_id)
+        ).first()
+        if check_duplicate:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="result already exists for the experiment"
+            )
+        # Update experiment status
+        experiment.curr_status = COMPLETE
+        experiment.end_time = datetime.now(timezone.utc)
+        # Calculate results
+        result = run_stats_engine(experiment_id, db_session)
+        # Create new Result & insert into db
+        new_result = Result(**result)
+        # Push changes
+        db_session.add(new_result)
+        db_session.commit()
+        db_session.refresh(new_result)
+        return new_result
 
 ## Read
 # Read experiments info
