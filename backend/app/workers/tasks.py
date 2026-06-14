@@ -1,4 +1,5 @@
 from sqlalchemy import select
+from googleapiclient.errors import HttpError
 from app.workers.celery_app import app
 from app.services.youtube import ingest_youtube_data
 from app.services.sentiment import sentiment_analysis
@@ -38,11 +39,13 @@ def schedule_ingestion():
         db_session.close()
 
 # Define task for ingestion
-@app.task
-def ingestion_task(topic_id: str, project_id: str, platform_id: str, keywords: list[str]):
+@app.task(bind=True, max_retries=3, default_retry_delay=60)
+def ingestion_task(self, topic_id: str, project_id: str, platform_id: str, keywords: list[str]):
     db_session = SessionLocal()
     try:
         ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)
+    except HttpError as e:
+        raise self.retry(exc=e)
     finally:
         db_session.close()
 

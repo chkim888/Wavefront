@@ -1,6 +1,6 @@
 import re
 from uuid import UUID
-from sqlalchemy import select
+from sqlalchemy import select, and_, is_
 from transformers import pipeline
 from app.models.buzz_monitor import Post
 
@@ -26,7 +26,10 @@ def sentiment_analysis(topic_id, db_session):
 # Fetch all posts (ID only) from database associated with the input topic ID
 def fetch_posts(topic_id: UUID, db_session):
     posts = db_session.scalars(
-        select(Post).where(Post.topic_id == topic_id)
+        select(Post).where(and_(
+            Post.topic_id == topic_id,
+            Post.sentiment_label.is_(None)
+        ))
     ).all()
     return posts
 

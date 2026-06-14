@@ -40,8 +40,12 @@ class Project_Platform(Base):
 
 class Post(Base):
     __tablename__ = "posts"
+    __table_args__ = (
+        UniqueConstraint('platform_id', 'external_id', name='uq_platform_external'),
+    )
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
+    external_id: Mapped[str] = mapped_column()
     topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
     project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"))
     platform_id: Mapped[PyUUID] = mapped_column(ForeignKey("platforms.id"))

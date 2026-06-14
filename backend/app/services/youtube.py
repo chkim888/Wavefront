@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from sqlalchemy import select, is_, and_
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from app.models.buzz_monitor import Post
@@ -16,6 +17,17 @@ MAX_RESULTS = 10
 def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session):
     # search videos
     video_ids = search_videos(keywords)
+    # Remove duplicate videos (ID already exists in db)
+    dedup_video_ids = list()
+    for id in video_ids:
+        duplicate_check = db_session.scalars(
+            select(Post).where(and_(
+                Post.external_id == id,
+                Post.platform_id == platform_id
+        ))).first()
+        if not duplicate_check:
+            dedup_video_ids.append(id)
+    video_ids = dedup_video_ids
     # get metadata & comments
     metadata = get_video_metadata(video_ids)
     comments = list()
@@ -29,6 +41,7 @@ def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)
     # Add post metadata
     for post in metadata:
         new_post = Post(
+            external_id = post["external_id"],
             topic_id = topic_id,
             project_id = project_id,
             platform_id = platform_id,
@@ -43,19 +56,28 @@ def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)
         db_session.add(new_post)
     # Add comments
     for comment in comments:
-        new_comment = Post(
-            topic_id = topic_id,
-            project_id = project_id,
-            platform_id = platform_id,
-            original_poster = comment["original_poster"],
-            posted_time = comment["posted_time"],
-            content_type = comment["content_type"],
-            content = comment["content"],
-            view_count = comment["view_count"],
-            like_count = comment["like_count"],
-            comment_count = comment["comment_count"]
-        )
-        db_session.add(new_comment)
+        # Check if the same comment is already in the table
+        duplicate_check = db_session.scalars(
+            select(Post).where(and_(
+                Post.external_id == comment["external_id"],
+                Post.platform_id == platform_id
+            ))
+        ).first()
+        if not duplicate_check:
+            new_comment = Post(
+                external_id = comment["external_id"],
+                topic_id = topic_id,
+                project_id = project_id,
+                platform_id = platform_id,
+                original_poster = comment["original_poster"],
+                posted_time = comment["posted_time"],
+                content_type = comment["content_type"],
+                content = comment["content"],
+                view_count = comment["view_count"],
+                like_count = comment["like_count"],
+                comment_count = comment["comment_count"]
+            )
+            db_session.add(new_comment)
     db_session.commit()
     # Call function to run sentiment analysis on the ingested posts
     sentiment_analysis(topic_id, db_session)
@@ -95,6 +117,7 @@ def get_video_metadata(video_ids: list[str]):
     # Create a dictionary for each response & append to result
     for data in response['items']:
         new_metadata = dict(
+            external_id=data["id"],
             original_poster=data["snippet"]["channelId"],
             posted_time=data["snippet"]["publishedAt"],
             content_type="video",
@@ -122,6 +145,7 @@ def get_video_comments(video_id: str, max_results: int = MAX_RESULTS):
     for data in response['items']:
         comment = data["snippet"]["topLevelComment"]
         new_metadata = dict(
+            external_id=data["id"],
             original_poster=comment["snippet"]["authorDisplayName"],
             posted_time=comment["snippet"]["publishedAt"],
             content_type="comment",
