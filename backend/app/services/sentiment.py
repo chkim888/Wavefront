@@ -1,6 +1,6 @@
 import re
 from uuid import UUID
-from sqlalchemy import select, and_, is_
+from sqlalchemy import select, and_
 from transformers import pipeline
 from app.models.buzz_monitor import Post
 from app.constants import MODEL, SENTIMENT_ANALYSIS

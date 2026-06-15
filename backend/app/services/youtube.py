@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-from sqlalchemy import select, is_, and_
+from sqlalchemy import select, and_
 from googleapiclient import discovery
 from googleapiclient.errors import HttpError
 from app.models.buzz_monitor import Post
