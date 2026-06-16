@@ -32,9 +32,10 @@ def create_experiment(experiment: ExperimentBase, user=Depends(get_current_user)
             project_id=experiment.project_id,
             title=experiment.title,
             description=experiment.description,
-            curr_status=experiment.curr_status,
+            curr_status=CREATED,
             traffic_split=experiment.traffic_split,
             success_metric=experiment.success_metric,
+            start_time=datetime.now(timezone.utc)
         )
         db_session.add(new_experiment)
         db_session.commit()

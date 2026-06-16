@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from app.database import get_db_session
 from app.schemas.experiment import AssignmentResponse
 from app.models.experiment import Assignment, Experiment
-from app.services.assignments import get_variant
+from app.services.assignments import decide_variant
 from app.services.assignments import get_or_assign_variant
 from app.constants import RUNNING
 

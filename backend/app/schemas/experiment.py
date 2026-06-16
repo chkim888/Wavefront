@@ -8,12 +8,12 @@ class ExperimentBase(BaseModel):
     project_id: UUID
     title: str
     description: str
-    curr_status: Literal['created', 'running', 'complete', 'archived']
     traffic_split: int
     success_metric: str
 
 class ExperimentResponse(ExperimentBase):
     id: UUID
+    curr_status: Literal['created', 'running', 'complete', 'archived']
     start_time: Optional[datetime]
     end_time: Optional[datetime]
     model_config = ConfigDict(from_attributes=True)

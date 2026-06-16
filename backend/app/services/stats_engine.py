@@ -70,7 +70,7 @@ def get_results(experiment_id, assignment_counts, conversion_counts, db_session)
         # calculate lift
         lift = calculate_lift(treatment_rate, control_rate)
         # perform chi-square test
-        chi2, p_value, dof, expected = perform_chi_square_test(assignment_counts, conversion_counts)
+        _, p_value, _, _ = perform_chi_square_test(assignment_counts, conversion_counts)
         # calculate statistical confidence
         confidence = (1 - p_value) * 100
         # determine winner
