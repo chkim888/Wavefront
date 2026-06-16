@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>demo-app</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>Streamo!</header>
+
+    <!-- Initially put a placeholder before assigned image loads -->
+    <div id="banner" class="banner"></div>
+
+    <!-- Listing of shows -->
+    <div class="contents">
+        <div class="content-row">
+            <h3>For You</h3>
+            <div class="row-items">
+                <div class="content">
+                    <p>show1</p>
+                    <button id="ab-button-click">Watch Now</button>
+                </div>
+                <div class="content">
+                    <p>show2</p>
+                    <button>Watch Now</button>
+                </div>
+                <div class="content">
+                    <p>show3</p>
+                    <button>Watch Now</button>
+                </div>
+            </div>
+        </div>
+        <div class="content-row">
+            <h3>Fan Favorites</h3>
+            <div class="row-items">
+                <div class="content">
+                    <p>show4</p>
+                    <button>Watch Now</button>
+                </div>
+                <div class="content">
+                    <p>show5</p>
+                    <button>Watch Now</button>
+                </div>
+                <div class="content">
+                    <p>show6</p>
+                    <button>Watch Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    // Set constants -- hard-coded for simplicity (bypassing permission, etc.)
+    const BASE_URL = "http://localhost:8000"
+    const EXPERIMENT_ID = "f3b6a6db-cbe7-4eac-a83d-0a34bdc772bc";
+
+    // Method for fetching old or getting new browser session ID using local storage
+    function getSessionId() {
+        // Try to retrieve session ID from local storage
+        let sessionId = localStorage.getItem('streamo-session-id');
+        // Set a new session ID if there is no value set yet
+        if (!sessionId) {
+            sessionId = localStorage.setItem('streamo-session-id', crypto.randomUUID());
+        }
+        return sessionId;
+    }
+
+    // Get relevant HTML elements & values
+    const session_id = getSessionId();
+    const variantElement = document.getElementById("banner");
+    const metricElement = document.getElementById("ab-button-click");
+
+    // Change banner based on assigned variant
+    async function setVariant() {
+        try { 
+            // Send post request to Wavefront's backend to get variant info
+            const response = await fetch(`${BASE_URL}/flags/${EXPERIMENT_ID}/${session_id}`, {
+                method: "POST"
+            });
+            if (!response.ok) {
+                const error = await res.json();
+                variantElement.classList.add("control");
+                console.log(error.detail, res.status);
+                return;
+            }
+            // Fetch data 
+            const data = await response.json();
+            if (data.enabled)
+                variantElement.classList.add("treatment");
+            else
+                variantElement.classList.add("control");
+        } catch (e) {
+            variantElement.classList.add("control");
+        }
+    }
+
+    // Add event listener to the metric element
+    metricElement.addEventListener("click", async () => {
+        try {
+            const response = await fetch(`${BASE_URL}/events/${EXPERIMENT_ID}/${sessionId}`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({event_type: "ab_button_click"})
+            })
+            if (!response.ok) {
+                const err = await res.json();
+                console.log(err.detail);
+                return;
+            }
+        } catch (e) {
+            console.log(e.message); // Just pass the error message
+        }
+    });
+
+    // Call setVariant
+    setVariant();
+
+</script>
+</html>
