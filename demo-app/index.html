@@ -67,7 +67,7 @@
     }
 
     // Get relevant HTML elements & values
-    const session_id = getSessionId();
+    const sessionId = getSessionId();
     const variantElement = document.getElementById("banner");
     const metricElement = document.getElementById("ab-button-click");
 
@@ -75,7 +75,7 @@
     async function setVariant() {
         try { 
             // Send post request to Wavefront's backend to get variant info
-            const response = await fetch(`${BASE_URL}/flags/${EXPERIMENT_ID}/${session_id}`, {
+            const response = await fetch(`${BASE_URL}/flags/${EXPERIMENT_ID}/${sessionId}`, {
                 method: "POST"
             });
             if (!response.ok) {
