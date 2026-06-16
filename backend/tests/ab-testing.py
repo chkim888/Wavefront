@@ -24,6 +24,7 @@ NUM_SIM = 500
 experiment_id = "f3b6a6db-cbe7-4eac-a83d-0a34bdc772bc"
 
 # adjustable values for different chi-square test winners
+# ex) there's 35% chance that user assigned control variant will click on the button 
 CONTROL_CHANCE = 0.35
 TREATMENT_CHANCE = 0.2
 
