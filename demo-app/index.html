@@ -101,7 +101,7 @@
             const response = await fetch(`${BASE_URL}/events/${EXPERIMENT_ID}/${sessionId}`, {
                 method: "POST",
                 headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({event_type: "ab_button_click"})
+                body: JSON.stringify({event_type: "button_click"})
             })
             if (!response.ok) {
                 const err = await res.json();
