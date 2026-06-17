@@ -25,5 +25,10 @@ def check_flag(experiment_id: UUID, session_id: str, db_session=Depends(get_db_s
             status_code=status.HTTP_409_CONFLICT, 
             detail="Experiment is not currently running"
         )
+    if not session_id:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="The session ID was not fetched correctly"
+        )
     assignment = get_or_assign_variant(session_id, experiment, db_session)
     return {"enabled": assignment.variant == TREATMENT}
