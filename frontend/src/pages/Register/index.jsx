@@ -1,4 +1,4 @@
-import authFetch from "@/api/axios";
+import { registerUser } from "@/api/auth";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -18,11 +18,7 @@ function Register() {
         return;
       }
       // Send API request to the backend register endpoint
-      const res = await authFetch.post("/auth/register", {
-        email: email,
-        username: username,
-        password: password,
-      });
+      const res = await registerUser(email, username, password);
       if (!res) {
         console.log("Unsuccessful register attempt");
       }

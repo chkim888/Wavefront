@@ -119,7 +119,7 @@ def get_all_projects(user=Depends(get_current_user), db_session=Depends(get_db_s
 
 # Get one project info
 @router.get("/{project_id}", response_model=ProjectResponse)
-def get_project_info(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
+def get_project(project_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Check if the user has access to the project
     permission_check = select(User_Project).where(and_(project_id == User_Project.project_id, user.id == User_Project.user_id))
     if not db_session.scalars(permission_check).first(): # user does not have access

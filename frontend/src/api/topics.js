@@ -1,0 +1,29 @@
+import authFetch from "./axios";
+
+export const getAllTopics = async (project_id) => {
+  try {
+    // Send GET request to fetch all topics
+    const res = await authFetch.get(`/topics/${project_id}`);
+    return res.data;
+  } catch (e) {
+    console.log("Topics could not get fetched");
+  }
+};
+
+export const getPostsForTopic = async (topicId) => {
+  try {
+    const res = await authFetch.get(`/topics/posts/${topicId}`);
+    return res.data;
+  } catch (e) {
+    console.log("Posts could not get fetched");
+  }
+};
+
+export const getKeywords = async (topicId) => {
+  try {
+    const res = await authFetch.get(`/topics/keywords/${topicId}`);
+    return res.data;
+  } catch (e) {
+    console.log("Posts could not get fetched");
+  }
+};

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
-import authFetch from "@/api/axios";
+import { loginUser } from "@/api/auth";
 
 function Login() {
   // set states for input values
@@ -19,12 +19,9 @@ function Login() {
         return;
       }
       // make API call
-      const res = await authFetch.post("/auth/login", {
-        username: username,
-        password: password,
-      });
+      const res = await loginUser(username, password);
       // call login() with the token
-      login(res.data.access_token);
+      login(res.access_token);
       // After successful login, navigate to the buzz monitor page
       navigate("/buzz");
     } catch (error) {
