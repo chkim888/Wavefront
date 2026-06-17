@@ -6,6 +6,7 @@ from app.database import get_db_session
 from app.models.experiment import Assignment, Event, Experiment
 from app.schemas.experiment import EventResponse, EventCreate
 from app.constants import RUNNING
+from app.dependencies import get_experiment_by_id
 
 # Router initialization
 router = APIRouter(prefix="/events")
@@ -14,14 +15,7 @@ router = APIRouter(prefix="/events")
 @router.post("/{experiment_id}/{session_id}", response_model=EventResponse | None)
 def create_event(experiment_id: UUID, session_id: str, event_data: EventCreate, db_session=Depends(get_db_session)):
     # fetch experiment
-    experiment = db_session.scalars(
-        select(Experiment).where(Experiment.id == experiment_id)
-    ).first()
-    if not experiment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
+    experiment = get_experiment_by_id(experiment_id, db_session)
     # Check if the experiment is running
     curr_status = experiment.curr_status
     if curr_status != RUNNING:

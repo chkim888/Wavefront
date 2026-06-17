@@ -9,6 +9,7 @@ from app.models.experiment import Experiment, Result
 from app.models.user import User_Project
 from app.services.stats_engine import run_stats_engine
 from app.constants import OWNER, VIEWER, CREATED, RUNNING, COMPLETE
+from app.dependencies import get_experiment_by_id
 
 # Router initialization
 router = APIRouter(prefix="/experiments")
@@ -46,14 +47,7 @@ def create_experiment(experiment: ExperimentBase, user=Depends(get_current_user)
 @router.post("/{experiment_id}/start", response_model=ExperimentResponse)
 def start_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Fetch experiment details
-    experiment = db_session.scalars(
-        select(Experiment).where(Experiment.id == experiment_id)
-    ).first()
-    if not experiment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
+    experiment = get_experiment_by_id(experiment_id, db_session)
     # Check user permission for project (ownership)
     if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         # Check if the experiment hasn't been started yet
@@ -75,14 +69,7 @@ def start_experiment(experiment_id: UUID, user=Depends(get_current_user), db_ses
 @router.post("/{experiment_id}/stop", response_model=ResultResponse)
 def stop_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     # Fetch experiment details
-    experiment = db_session.scalars(
-        select(Experiment).where(Experiment.id == experiment_id)
-    ).first()
-    if not experiment:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
+    experiment = get_experiment_by_id(experiment_id, db_session)
     # Check user permission for project (ownership)
     if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         # Check if the experiment hasn't been started yet
@@ -128,20 +115,15 @@ def get_all_experiments(project_id: UUID, user=Depends(get_current_user), db_ses
 # Read one experiment info
 @router.get("/{experiment_id}", response_model=ExperimentResponse)
 def get_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
-    if experiment and permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
+    experiment = get_experiment_by_id(experiment_id, db_session)
+    if permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
         return experiment
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
 
 # Read result
 @router.get("/{experiment_id}/result", response_model=ResultResponse)
 def get_result(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
-    if experiment and permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
+    experiment = get_experiment_by_id(experiment_id, db_session)
+    if permission_check(user.id, experiment.project_id, db_session) in [OWNER, VIEWER]:
         result = db_session.scalars(
             select(Result).where(Result.experiment_id == experiment_id)
         ).first()
@@ -151,18 +133,13 @@ def get_result(experiment_id: UUID, user=Depends(get_current_user), db_session=D
                 detail="Result not found"
             )
         return result
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
 
 ## Update
 # update experiments
 @router.patch("/{experiment_id}", response_model=ExperimentResponse)
 def update_experiment(experiment_id: UUID, updates: ExperimentUpdate, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
-    if experiment and permission_check(user.id, experiment.project_id, db_session) == OWNER:
+    experiment = get_experiment_by_id(experiment_id, db_session)
+    if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         if updates.title:
             existing = db_session.scalars(
                 select(Experiment).where(
@@ -186,22 +163,12 @@ def update_experiment(experiment_id: UUID, updates: ExperimentUpdate, user=Depen
         db_session.commit()
         db_session.refresh(experiment)
         return experiment
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
 
 ## Delete
 # Delete experiment
 @router.delete("/{experiment_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_experiment(experiment_id: UUID, user=Depends(get_current_user), db_session=Depends(get_db_session)):
-    experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
-    if experiment and permission_check(user.id, experiment.project_id, db_session) == OWNER:
+    experiment = get_experiment_by_id(experiment_id, db_session)
+    if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         db_session.delete(experiment)
         db_session.commit()
-    else:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="Experiment not found"
-        )
