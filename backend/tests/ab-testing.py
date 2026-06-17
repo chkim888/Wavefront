@@ -9,6 +9,7 @@ from app.database import SessionLocal
 from app.schemas.experiment import EventCreate
 from app.services.stats_engine import run_stats_engine
 from app.constants import CONTROL, RUNNING
+from app.dependencies import get_experiment_by_id
 '''
 This is for checking the A/B testing pipeline end to end
 Things that I'll need to test in order:
@@ -32,7 +33,7 @@ TREATMENT_CHANCE = 0.2
 db_session = SessionLocal()
 try:
     # Fetch experiment from db
-    experiment = db_session.scalars(select(Experiment).where(Experiment.id == experiment_id)).first()
+    experiment = get_experiment_by_id(experiment_id, db_session)
 
     # Each simulation is a unique session -- insert in necessary data
     for i in range(NUM_SIM):
