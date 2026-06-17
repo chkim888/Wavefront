@@ -13,7 +13,6 @@ function Layout() {
         </nav>
       </div>
       <div>
-        // Outlet is the placeholder where the matched child route components will be rendered
         <Outlet />
       </div>
     </>
