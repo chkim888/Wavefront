@@ -6,9 +6,12 @@ from datetime import datetime
 ## User
 class UserBase(BaseModel): # Base class for User type
     username: str
-    email: str
 
-class UserCreate(UserBase): # When new user is created
+class UserRegister(UserBase): # When new user is created
+    email: str
+    password: str
+
+class UserLogin(UserBase):
     password: str
 
 class UserResponse(UserBase): # What user gets in return

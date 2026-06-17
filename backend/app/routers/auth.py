@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select, or_
 import bcrypt
-from app.schemas.user import UserCreate, UserResponse
+from app.schemas.user import UserRegister, UserLogin, UserResponse
 from app.models.user import User
 from app.database import get_db_session
 from app.auth.jwt import create_access_token
@@ -11,7 +11,7 @@ from app.auth.jwt import create_access_token
 router = APIRouter(prefix="/auth")
 
 @router.post("/register", response_model=UserResponse)
-def register(user: UserCreate, db_session = Depends(get_db_session)):
+def register(user: UserRegister, db_session = Depends(get_db_session)):
     # check if email or username is in the database
     duplicate_check = select(User).where(
         or_(User.email == user.email, User.username == user.username))
@@ -38,7 +38,7 @@ def register(user: UserCreate, db_session = Depends(get_db_session)):
         return new_user
 
 @router.post("/login")
-def login(user: UserCreate, db_session = Depends(get_db_session)):
+def login(user: UserLogin, db_session = Depends(get_db_session)):
     # check if username exists 
     db_user = db_session.scalars(
         select(User).where(User.username == user.username)

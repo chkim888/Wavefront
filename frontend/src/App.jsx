@@ -4,11 +4,13 @@ import Alerts from "./pages/Alerts";
 import Analytics from "./pages/Analytics";
 import BuzzMonitor from "./pages/BuzzMonitor";
 import ExperimentManager from "./pages/ExperimentManager";
+import Login from "./pages/Login"
 
 function App() {
   return (
     <Routes>
       <Route element={<Layout />}>
+        <Route path="/login" element={<Login />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/buzz" element={<BuzzMonitor />} />
