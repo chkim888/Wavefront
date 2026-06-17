@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/AuthContext";
 import authFetch from "@/api/axios";
 
@@ -20,8 +20,8 @@ function Login() {
       }
       // make API call
       const res = await authFetch.post("/auth/login", {
-        username,
-        password,
+        username: username,
+        password: password,
       });
       // call login() with the token
       login(res.data.access_token);
@@ -34,27 +34,31 @@ function Login() {
 
   return (
     // JSX form
-    <form onSubmit={handleSubmit}>
-      <label>
-        Username:
-        <input
-          type="text"
-          name="username"
-          value={username}
-          onChange={(e) => setUsername(e.target.value)} // updating username with event changes
-        />
-      </label>
-      <label>
-        Password:
-        <input
-          type="text"
-          name="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
-      </label>
-      <button type="submit">Submit</button>
-    </form>
+    <>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Username:
+          <input
+            type="text"
+            name="username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)} // updating username with event changes
+          />
+        </label>
+        <label>
+          Password:
+          <input
+            type="text"
+            name="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </label>
+        <button type="submit">Login</button>
+      </form>
+      <text>Not a registered user?</text>
+      <Link to="/register">Register here</Link>
+    </>
   );
 }
 
