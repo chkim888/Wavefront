@@ -1,9 +1,9 @@
 import authFetch from "./axios";
 
-export const getAllTopics = async (project_id) => {
+export const getAllTopics = async (projectId) => {
   try {
     // Send GET request to fetch all topics
-    const res = await authFetch.get(`/topics/${project_id}`);
+    const res = await authFetch.get(`/topics/${projectId}`);
     return res.data;
   } catch (e) {
     console.log("Topics could not get fetched");
