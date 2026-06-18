@@ -23,7 +23,7 @@ function Login() {
       // call login() with the token
       login(res.access_token);
       // After successful login, navigate to the buzz monitor page
-      navigate("/buzz");
+      navigate("/manage");
     } catch (error) {
       console.error(error);
     }
