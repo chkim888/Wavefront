@@ -51,7 +51,7 @@ def start_experiment(experiment_id: UUID, user=Depends(get_current_user), db_ses
     # Check user permission for project (ownership)
     if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         # Check if the experiment hasn't been started yet
-        if experiment.curr_status != CREATED:
+        if experiment.curr_status != CREATED and experiment.curr_status != COMPLETE:
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Experiment already started"
