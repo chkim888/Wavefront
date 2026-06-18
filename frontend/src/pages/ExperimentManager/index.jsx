@@ -20,7 +20,7 @@ function ExperimentManager() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [trafficSplit, setTrafficSplit] = useState(0);
-  const [successMetric, setSuccessMetric] = useState(0);
+  const [successMetric, setSuccessMetric] = useState("");
 
   // on load, get all projects
   useEffect(() => {
@@ -212,13 +212,49 @@ function ExperimentManager() {
       {/* Result view */}
       {selectedExperiment?.curr_status === "COMPLETE" && (
         <>
-          <h1>Experiment Result</h1>
-          <h3>Winner:</h3>
-          <h4>{result.winner}</h4>
-          <h3>Confidence:</h3>
-          <h4>{result.confidence}</h4>
-          <h3>Conclusion:</h3>
-          <h4>{result.conclusion}</h4>
+          {result.winner === "INSUFFICIENT_DATA" ? (
+            <p>Insufficient data to determine winner</p>
+          ) : (
+            <table>
+              <thead>
+                <tr>
+                  <th></th>
+                  <th>Control</th>
+                  <th>Treatment</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Conversions</td>
+                  <td>{result.control_conversions}</td>
+                  <td>{result.treatment_conversions}</td>
+                </tr>
+                <tr>
+                  <td>Conversion Rate</td>
+                  <td>{(result.control_rate * 100).toFixed(1) + "%"}</td>
+                  <td>{(result.treatment_rate * 100).toFixed(1) + "%"}</td>
+                </tr>
+                <tr>
+                  <td>Lift</td>
+                  <td>{(result.lift * 100).toFixed(1) + "%"}</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Confidence</td>
+                  <td>{(result.confidence * 100).toFixed(1) + "%"}</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td>Winner</td>
+                  <td>
+                    {(result.winner === "TREATMENT" && "Treatment ✓") ||
+                      "Control  ✓"}
+                  </td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          )}
         </>
       )}
     </>
