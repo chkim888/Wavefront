@@ -58,6 +58,9 @@ function Alerts() {
           setSelectedProject(projects.find((p) => p.name === e.target.value));
         }}
       >
+        <option value="" disabled hidden>
+          Choose a project...
+        </option>
         {projects.map((project) => (
           <option key={project.id} value={project.name}>
             {project.name}
