@@ -75,7 +75,7 @@ def get_posts_for_topic(topic_id: UUID, user=Depends(get_current_user), db_sessi
     project_id = db_session.scalars(select(Topic.project_id).where(Topic.id == topic_id)).first()
     if project_id:
         if permission_check(user.id, project_id, db_session) in [OWNER, VIEWER]:
-            posts = db_session.execute(
+            posts = db_session.scalars(
                 select(Post).where(Post.topic_id == topic_id)
             ).all()
             return posts

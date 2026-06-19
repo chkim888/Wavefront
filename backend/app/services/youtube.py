@@ -15,6 +15,7 @@ YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 def ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session):
     # search videos
     video_ids = search_videos(keywords)
+    video_ids = list(set(video_ids))
     # Remove duplicate videos (ID already exists in db)
     dedup_video_ids = list()
     for id in video_ids:
@@ -114,15 +115,17 @@ def get_video_metadata(video_ids: list[str]):
     response = request.execute()
     # Create a dictionary for each response & append to result
     for data in response['items']:
+        snippet = data.get("snippet", {})
+        stats = data.get("statistics", {}) 
         new_metadata = dict(
-            external_id=data["id"],
-            original_poster=data["snippet"]["channelId"],
-            posted_time=data["snippet"]["publishedAt"],
+            external_id=data.get("id"),
+            original_poster=snippet.get("channelId"),
+            posted_time=snippet.get("publishedAt"),
             content_type="video",
-            content=data["snippet"]["title"] + "\n\n" + data["snippet"]["description"],
-            view_count=data["statistics"]["viewCount"],
-            like_count=data["statistics"]["likeCount"],
-            comment_count=data["statistics"]["commentCount"]
+            content=snippet.get("title", "") + "\n\n" + snippet.get("description", ""),
+            view_count=stats.get("viewCount", 0),
+            like_count=stats.get("likeCount", 0),
+            comment_count=stats.get("commentCount", 0)
         )
         metadata.append(new_metadata)
     return metadata
@@ -140,16 +143,18 @@ def get_video_comments(video_id: str, max_results: int = MAX_RESULTS):
     )
     response = request.execute()
     # Create a dictionary for each response & append to result
-    for data in response['items']:
-        comment = data["snippet"]["topLevelComment"]
+    for data in response.get('items', []):
+        snippet = data.get("snippet", {})
+        comment = snippet.get("topLevelComment", {})
+        c_snippet = comment.get("snippet", {})
         new_metadata = dict(
-            external_id=data["id"],
-            original_poster=comment["snippet"]["authorDisplayName"],
-            posted_time=comment["snippet"]["publishedAt"],
+            external_id=data.get("id"),
+            original_poster=c_snippet.get("authorDisplayName"),
+            posted_time=c_snippet.get("publishedAt"),
             content_type="comment",
-            content=comment["snippet"]["textDisplay"],
+            content=c_snippet.get("textDisplay"),
             view_count=None,
-            like_count=comment["snippet"]["likeCount"],
+            like_count=c_snippet.get("likeCount", 0),
             comment_count=None
         )
         metadata.append(new_metadata)

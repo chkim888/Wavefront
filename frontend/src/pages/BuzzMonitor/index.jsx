@@ -75,6 +75,7 @@ function BuzzMonitor() {
           setSelectedProject(projects.find((p) => p.name === e.target.value))
         }
       >
+        <option value="" disabled hidden>Choose a project...</option>
         {projects.map((project) => (
           <option key={project.id} value={project.name}>
             {project.name}
@@ -91,6 +92,7 @@ function BuzzMonitor() {
             setSelectedTopic(topics.find((t) => t.title === e.target.value))
           }
         >
+          <option value="" disabled hidden>Choose a topic...</option>
           {topics.map((topic) => (
             <option key={topic.id} value={topic.title}>
               {topic.title}
@@ -101,14 +103,14 @@ function BuzzMonitor() {
 
       {/* posts list */}
       {selectedTopic && (
-        <div>
+        <ul>
           {posts.map((post) => (
             <li key={post.id}>
               <span>{post.content}</span>
               <span>{post.sentiment_label}</span>
             </li>
           ))}
-        </div>
+        </ul>
       )}
     </>
   );

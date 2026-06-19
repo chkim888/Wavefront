@@ -54,6 +54,11 @@ class PostBase(BaseModel):
 
 class PostResponse(PostBase):
     id: UUID
+    view_count: Optional[int]
+    like_count: Optional[int]
+    comment_count: Optional[int]
+    sentiment_label: Optional[Literal['positive', 'negative', 'neutral']]
+    sentiment_score: Optional[float]
     model_config = ConfigDict(from_attributes=True)
 
 class PostCountsUpdate(PostBase):
