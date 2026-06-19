@@ -11,6 +11,8 @@ import {
   Line,
   BarChart,
   Bar,
+  Cell,
+  Legend,
 } from "recharts";
 
 function Analytics() {
@@ -22,6 +24,12 @@ function Analytics() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [posts, setPosts] = useState([]);
   const [results, setResults] = useState([]);
+  // color definition for charts
+  const COLORS = {
+    positive: "#77DD76", // Green
+    neutral: "#FDFD96", // Yellow
+    negative: "#FF6961", // Red
+  };
 
   // page loads
   // load on initial page load
@@ -57,6 +65,8 @@ function Analytics() {
           res.push(response);
         }
         setResults(res);
+        // reset
+        setPosts([]);
       } catch (e) {
         console.error(e);
       }
@@ -98,14 +108,17 @@ function Analytics() {
   const sentimentTimeline = useMemo(() => {
     if (!posts?.length) return [];
     const postsByDate = posts.reduce((acc, post) => {
-      const date = post.posted_time.split("T")[0];
+      // By month
+      const date = post.posted_time.split("T")[0].slice(0, 7);
       if (!acc[date]) {
         acc[date] = { date, positive: 0, neutral: 0, negative: 0 };
       }
       acc[date][post.sentiment_label] += 1;
       return acc;
     }, {});
-    return Object.values(postsByDate);
+    return Object.values(postsByDate).sort(
+      (a, b) => new Date(a.date) - new Date(b.date),
+    );
   }, [posts]);
 
   // control vs. treatment conversion rates across experiments for a project
@@ -136,8 +149,11 @@ function Analytics() {
           setSelectedProject(projects.find((p) => p.name === e.target.value))
         }
       >
+        <option value="" disabled hidden>
+          Choose a project...
+        </option>
         {projects.map((project) => (
-          <option id={project.id} value={project.name}>
+          <option key={project.id} value={project.name}>
             {project.name}
           </option>
         ))}
@@ -152,8 +168,9 @@ function Analytics() {
             setSelectedTopic(topics.find((t) => t.title === e.target.value))
           }
         >
+          <option value="">Choose a topic...</option>
           {topics.map((topic) => (
-            <option id={topic.id} value={topic.title}>
+            <option key={topic.id} value={topic.title}>
               {topic.title}
             </option>
           ))}
@@ -164,19 +181,48 @@ function Analytics() {
       {/* Pie chart showing posts' sentiment counts for selected topic */}
       {selectedTopic && (
         <PieChart width={400} height={400}>
-          <Pie data={sentimentCounts} dataKey="count" nameKey="sentiment"></Pie>
+          <Pie
+            data={sentimentCounts}
+            dataKey="count"
+            nameKey="sentiment"
+            label={({ sentiment, count }) => `${sentiment}: ${count}`}
+          >
+            {sentimentCounts.map((entry) => (
+              <Cell
+                key={`cell-${entry.sentiment}`}
+                fill={COLORS[entry.sentiment] || "#8884d8"}
+              />
+            ))}
+          </Pie>
+          <Legend />
         </PieChart>
       )}
 
       {/* Sentiment over time */}
       {/* Line chart showing sentiment trends across time for a topic */}
       {selectedTopic && (
-        <LineChart data={sentimentTimeline} width={500} height={300}>
+        <LineChart data={[...sentimentTimeline]} width={500} height={300}>
           <XAxis dataKey="date" />
           <YAxis />
-          <Line dataKey="positive" />
-          <Line dataKey="neutral" />
-          <Line dataKey="negative" />
+          <Legend />
+          <Line
+            dataKey="positive"
+            stroke="#22c55e"
+            strokeWidth={2}
+            name="Positive"
+          />
+          <Line
+            dataKey="neutral"
+            stroke="#94a3b8"
+            strokeWidth={2}
+            name="Neutral"
+          />
+          <Line
+            dataKey="negative"
+            stroke="#ef4444"
+            strokeWidth={2}
+            name="Negative"
+          />
         </LineChart>
       )}
 
@@ -186,8 +232,9 @@ function Analytics() {
         <BarChart data={conversionRates} width={500} height={300}>
           <XAxis dataKey="title" />
           <YAxis />
-          <Bar dataKey="control" />
-          <Bar dataKey="treatment" />
+          <Legend />
+          <Bar dataKey="control" fill="#AEC6CF" name="Control" />
+          <Bar dataKey="treatment" fill="#CFB7AE" name="Treatment" />
         </BarChart>
       )}
     </>
