@@ -2,6 +2,7 @@ import { getAlertsByProject } from "@/api/alerts";
 import { getAllProjects } from "@/api/projects";
 import { getAllTopics } from "@/api/topics";
 import { useEffect, useState } from "react";
+import { useWebSocket } from "@/hooks/useWebSocket";
 
 function Alerts() {
   // set state variables
@@ -9,6 +10,13 @@ function Alerts() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [topics, setTopics] = useState([]);
+
+  // for websocket
+  const newAlert = useWebSocket(selectedProject?.id);
+  useEffect(() => {
+    if (!newAlert?.message) return; // run only after first mount
+    setAlerts((prev) => [newAlert, ...prev]);
+  }, [newAlert]); // happens every time change happens for newAlert
 
   // on initial load
   useEffect(() => {
@@ -29,8 +37,8 @@ function Alerts() {
       try {
         if (!selectedProject) return;
         const projectId = selectedProject.id;
-        const al = await getAlertsByProject(projectId);
-        setAlerts(al);
+        const a = await getAlertsByProject(projectId);
+        setAlerts(a);
         const t = await getAllTopics(projectId);
         setTopics(t);
       } catch (e) {

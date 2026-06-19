@@ -36,3 +36,7 @@ INSUFFICIENT_DATA = "insufficient data"
 # Assignments
 CONTROL = "control"
 TREATMENT = "treatment"
+
+# Redis
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
