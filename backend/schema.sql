@@ -164,10 +164,10 @@ CREATE TABLE results (
 	experiment_id UUID PRIMARY KEY,
 	control_conversions INTEGER,
 	treatment_conversions INTEGER,
-	control_rate NUMERIC(4, 3),
-	treatment_rate NUMERIC(4, 3),
-	lift NUMERIC(4,3),
-	confidence NUMERIC(4, 3),
+	control_rate DOUBLE PRECISION,
+	treatment_rate DOUBLE PRECISION
+	lift DOUBLE PRECISION,
+	confidence DOUBLE PRECISION,
 	winner VARCHAR(50),
 	
 	-- FOREIGN KEY

@@ -12,7 +12,7 @@ router = APIRouter(prefix="/topics")
 
 ## Create
 # Create new topic (for a project)
-@router.post("/", response_model=TopicResponse)
+@router.post("", response_model=TopicResponse)
 def create_topic(topic: TopicBase, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     if permission_check(user.id, topic.project_id, db_session) == OWNER:
         new_topic = Topic(
@@ -96,7 +96,7 @@ def get_topics(project_id: UUID, user=Depends(get_current_user), db_session=Depe
 
 ## Update
 # Update topic title and/or description
-@router.patch("/", response_model=TopicResponse)
+@router.patch("", response_model=TopicResponse)
 def update_topic(updates: TopicUpdate, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     if permission_check(user.id, updates.project_id, db_session) == OWNER:
         topic = db_session.scalars(select(Topic).where(Topic.id == updates.id)).first()

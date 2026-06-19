@@ -52,10 +52,10 @@ class Result(Base):
     __tablename__ = "results"
 
     experiment_id: Mapped[PyUUID] = mapped_column(ForeignKey("experiments.id"), primary_key=True)
-    control_conversions: Mapped[int] = mapped_column()
-    treatment_conversions: Mapped[int] = mapped_column()
-    control_rate: Mapped[float] = mapped_column()
-    treatment_rate: Mapped[float] = mapped_column()
-    lift: Mapped[float] = mapped_column()
-    confidence: Mapped[float] = mapped_column()
+    control_conversions: Mapped[Optional[int]] = mapped_column()
+    treatment_conversions: Mapped[Optional[int]] = mapped_column()
+    control_rate: Mapped[Optional[float]] = mapped_column()
+    treatment_rate: Mapped[Optional[float]] = mapped_column()
+    lift: Mapped[Optional[float]] = mapped_column()
+    confidence: Mapped[Optional[float]] = mapped_column()
     winner: Mapped[Optional[str]] = mapped_column()

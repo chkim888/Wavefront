@@ -21,6 +21,12 @@ function ExperimentManager() {
   const [description, setDescription] = useState("");
   const [trafficSplit, setTrafficSplit] = useState(0);
   const [successMetric, setSuccessMetric] = useState("");
+  // constants
+  const CREATED = "created"
+  const RUNNING = "running"
+  const COMPLETE = "complete"
+  const ARCHIVED = "archived"
+  const INSUFFICIENT_DATA = "insufficient data"
 
   // on load, get all projects
   useEffect(() => {
@@ -35,7 +41,7 @@ function ExperimentManager() {
     fetch();
   }, []);
 
-  // get all experiments on project selection
+  // on project selection
   useEffect(() => {
     const fetch = async () => {
       try {
@@ -44,6 +50,10 @@ function ExperimentManager() {
         }
         const res = await getAllExperiments(selectedProject.id);
         setExperiments(res);
+        // reset
+        setSelectedExperiment(null);
+        setShowForm(false);
+        setResult({});
       } catch (e) {
         console.error(e);
       }
@@ -51,13 +61,16 @@ function ExperimentManager() {
     fetch();
   }, [selectedProject]);
 
-  // get result on experiment selection
+  // on experiment selection
   useEffect(() => {
+    if (selectedExperiment != null){
+      setShowForm(false);
+    }
     const fetch = async () => {
       try {
         if (
           !selectedExperiment ||
-          selectedExperiment.curr_status !== "COMPLETE"
+          selectedExperiment.curr_status !== COMPLETE
         )
           return;
         const res = await getResult(selectedExperiment.id);
@@ -68,6 +81,17 @@ function ExperimentManager() {
     };
     fetch();
   }, [selectedExperiment]);
+
+  // on form
+  useEffect(() => {
+    // reset values when form shown
+    if (showForm) {
+      setTitle("");
+      setDescription("");
+      setSuccessMetric("");
+      setTrafficSplit(0);
+    }
+  }, [showForm]);
 
   // handle when the experiment form is submitted
   const handleSubmit = async (e) => {
@@ -101,13 +125,13 @@ function ExperimentManager() {
     try {
       const currStatus = selectedExperiment.curr_status;
       // Run experiment if the experiment is created or complete (rerun)
-      if (currStatus === "CREATED" || currStatus === "COMPLETE") {
+      if (currStatus === CREATED || currStatus === COMPLETE) {
         const res = await startExperiment(selectedExperiment.id);
       }
-      if (currStatus === "RUNNING") {
+      if (currStatus === RUNNING) {
         const res = await stopExperiment(selectedExperiment.id);
       }
-      if (currStatus != "ARCHIVED") {
+      if (currStatus != ARCHIVED) {
         // update the list of experiments to reflect the changes in experiment status
         const updated = await getAllExperiments(selectedProject.id);
         setExperiments(updated);
@@ -130,6 +154,9 @@ function ExperimentManager() {
           setSelectedProject(projects.find((p) => p.name === e.target.value))
         }
       >
+        <option value="" disabled hidden>
+          Choose a project...
+        </option>
         {projects.map((project) => (
           <option key={project.id} value={project.name}>
             {project.name}
@@ -148,6 +175,9 @@ function ExperimentManager() {
             );
           }}
         >
+          <option value="" disabled hidden>
+            Choose an experiment...
+          </option>
           {experiments.map((experiment) => (
             <option key={experiment.id} value={experiment.title}>
               {experiment.title}
@@ -157,8 +187,13 @@ function ExperimentManager() {
       )}
 
       {/* Button to go to experiment creation form */}
-      {selectedProject && (
-        <button onClick={() => setShowForm(true)}>
+      {selectedProject && !showForm && (
+        <button
+          onClick={() => {
+            setShowForm(true);
+            setSelectedExperiment(null);
+          }}
+        >
           Create a New Experiment
         </button>
       )}
@@ -203,16 +238,16 @@ function ExperimentManager() {
       {/* start & stop experiment button */}
       {selectedExperiment && (
         <button onClick={toggleExperiment}>
-          {selectedExperiment.curr_status === "RUNNING" && "Stop"}
-          {selectedExperiment.curr_status === "CREATED" && "Start"}
-          {selectedExperiment.curr_status === "COMPLETE" && "Re-run"}
+          {selectedExperiment.curr_status === RUNNING && "Stop"}
+          {selectedExperiment.curr_status === CREATED && "Start"}
+          {selectedExperiment.curr_status === COMPLETE && "Re-run"}
         </button>
       )}
 
       {/* Result view */}
-      {selectedExperiment?.curr_status === "COMPLETE" && (
+      {selectedExperiment?.curr_status === COMPLETE && (
         <>
-          {result.winner === "INSUFFICIENT_DATA" ? (
+          {result.winner === INSUFFICIENT_DATA ? (
             <p>Insufficient data to determine winner</p>
           ) : (
             <table>
@@ -241,7 +276,7 @@ function ExperimentManager() {
                 </tr>
                 <tr>
                   <td>Confidence</td>
-                  <td>{(result.confidence * 100).toFixed(1) + "%"}</td>
+                  <td>{result.confidence + "%"}</td>
                   <td></td>
                 </tr>
                 <tr>

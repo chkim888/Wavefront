@@ -16,7 +16,7 @@ router = APIRouter(prefix="/experiments")
 
 ## Create
 # create a new experiment (for a project)
-@router.post("/", response_model=ExperimentResponse)
+@router.post("", response_model=ExperimentResponse)
 def create_experiment(experiment: ExperimentBase, user=Depends(get_current_user), db_session=Depends(get_db_session)):
     if permission_check(user.id, experiment.project_id, db_session) == OWNER:
         existing = db_session.scalars(
@@ -78,22 +78,20 @@ def stop_experiment(experiment_id: UUID, user=Depends(get_current_user), db_sess
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Experiment is not running"
             )
-        # Check if result already exists
-        check_duplicate = db_session.scalars(
-            select(Result).where(Result.experiment_id==experiment_id)
-        ).first()
-        if check_duplicate:
-            raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT,
-                detail="result already exists for the experiment"
-            )
         # Update experiment status
         experiment.curr_status = COMPLETE
         experiment.end_time = datetime.now(timezone.utc)
-        # Calculate results
-        result = run_stats_engine(experiment_id, db_session)
-        # Create new Result & insert into db
-        new_result = Result(**result)
+         # Check if result already exists
+        duplicate = db_session.scalars(
+            select(Result).where(Result.experiment_id==experiment_id)
+        ).first()
+        if duplicate:
+            new_result = duplicate # return old results
+        else:
+            # Calculate results
+            result = run_stats_engine(experiment_id, db_session)
+            # Create new Result & insert into db
+            new_result = Result(**result)
         # Push changes
         db_session.add(new_result)
         db_session.commit()

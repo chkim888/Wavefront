@@ -72,7 +72,7 @@ def get_results(experiment_id, assignment_counts, conversion_counts, db_session)
         # perform chi-square test
         _, p_value, _, _ = perform_chi_square_test(assignment_counts, conversion_counts)
         # calculate statistical confidence
-        confidence = (1 - p_value) * 100
+        confidence = round(float((1 - p_value) * 100), 3)
         # determine winner
         winner = determine_winner(confidence, treatment_rate, control_rate)
         # insert result into the database
@@ -90,13 +90,13 @@ def get_results(experiment_id, assignment_counts, conversion_counts, db_session)
 
 # Calculate control & treatment rates
 def calculate_rates(assignment_counts, conversion_counts):
-    control_rate = conversion_counts[CONTROL] / assignment_counts[CONTROL]
-    treatment_rate = conversion_counts[TREATMENT] / assignment_counts[TREATMENT]
+    control_rate = round((conversion_counts[CONTROL] / assignment_counts[CONTROL]), 3)
+    treatment_rate = round((conversion_counts[TREATMENT] / assignment_counts[TREATMENT]), 3)
     return control_rate, treatment_rate
 
 # Calculate lift (percentage improvement)
 def calculate_lift(treatment_rate, control_rate):
-    lift = (treatment_rate - control_rate) / control_rate
+    lift = round(((treatment_rate - control_rate) / control_rate), 3)
     return lift
 
 # Perform chi square test 

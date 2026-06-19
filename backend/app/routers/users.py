@@ -14,13 +14,13 @@ router = APIRouter(prefix="/users")
 
 ## Read
 # Read user information (username, email, created at)
-@router.get("/", response_model=UserResponse)
+@router.get("", response_model=UserResponse)
 def get_user(user = Depends(get_current_user)):
     return user
 
 ## Update
 # Update user information (username, email)
-@router.patch("/", response_model=UserResponse)
+@router.patch("", response_model=UserResponse)
 def update_user(updates: UserUpdate, user = Depends(get_current_user), db_session = Depends(get_db_session)):
     user_info = db_session.scalars(select(User).where(User.id == user.id)).first()
     if user_info:
@@ -55,7 +55,7 @@ def update_user(updates: UserUpdate, user = Depends(get_current_user), db_sessio
 
 ## Delete
 # Delete user
-@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("", status_code=status.HTTP_204_NO_CONTENT)
 def delete_user(user = Depends(get_current_user), db_session = Depends(get_db_session)):
     db_session.delete(user)
     db_session.commit()
