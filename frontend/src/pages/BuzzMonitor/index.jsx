@@ -9,18 +9,14 @@ function BuzzMonitor() {
   const [topics, setTopics] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [posts, setPosts] = useState([]);
-  const [loading, setLoading] = useState(false);
 
   // triggered on page load to fetch all projects
   useEffect(() => {
     const fetch = async () => {
       try {
-        setLoading(true);
         const res = await getAllProjects();
         setProjects(res);
-        setLoading(false);
       } catch (e) {
-        setLoading(false);
         console.error(e);
       }
     };
@@ -32,12 +28,12 @@ function BuzzMonitor() {
     if (!selectedProject) return;
     const fetch = async () => {
       try {
-        setLoading(true);
         const res = await getAllTopics(selectedProject.id);
         setTopics(res);
-        setLoading(false);
+        // reset for the new project
+        setPosts([]);
+        setSelectedTopic(null);
       } catch (e) {
-        setLoading(false);
         console.error(e);
       }
     };
@@ -49,12 +45,9 @@ function BuzzMonitor() {
     if (!selectedTopic) return;
     const fetch = async () => {
       try {
-        setLoading(true);
         const res = await getPostsForTopic(selectedTopic.id);
         setPosts(res);
-        setLoading(false);
       } catch (e) {
-        setLoading(false);
         console.error(e);
       }
     };
@@ -64,9 +57,6 @@ function BuzzMonitor() {
   return (
     // JSX for the buzz monitor page
     <>
-      {/* loading page */}
-      {loading && <h1>Loading...</h1>}
-      
       {/* project selector */}
       <select
         id="project-select"
@@ -75,7 +65,9 @@ function BuzzMonitor() {
           setSelectedProject(projects.find((p) => p.name === e.target.value))
         }
       >
-        <option value="" disabled hidden>Choose a project...</option>
+        <option value="" disabled hidden>
+          Choose a project...
+        </option>
         {projects.map((project) => (
           <option key={project.id} value={project.name}>
             {project.name}
@@ -87,12 +79,14 @@ function BuzzMonitor() {
       {selectedProject && (
         <select
           id="topic-select"
-          value={selectedTopic?.name ?? ""}
+          value={selectedTopic?.title ?? ""}
           onChange={(e) =>
             setSelectedTopic(topics.find((t) => t.title === e.target.value))
           }
         >
-          <option value="" disabled hidden>Choose a topic...</option>
+          <option value="" disabled hidden>
+            Choose a topic...
+          </option>
           {topics.map((topic) => (
             <option key={topic.id} value={topic.title}>
               {topic.title}
