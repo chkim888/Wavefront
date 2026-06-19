@@ -13,6 +13,9 @@ import {
   Bar,
   Cell,
   Legend,
+  ResponsiveContainer,
+  CartesianGrid,
+  Tooltip,
 } from "recharts";
 
 function Analytics() {
@@ -25,7 +28,7 @@ function Analytics() {
   const [posts, setPosts] = useState([]);
   const [results, setResults] = useState([]);
   // color definition for charts
-  const COLORS = {
+  const SENTIMENT_COLORS = {
     positive: "#77DD76", // Green
     neutral: "#FDFD96", // Yellow
     negative: "#FF6961", // Red
@@ -138,104 +141,166 @@ function Analytics() {
     return Object.values(rates);
   }, [results, experiments]);
 
+  // for styling
+  const selectClass =
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1]";
+  const cardClass = "bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 mb-6";
+
+  const tooltipStyle = {
+    backgroundColor: "#1e2130",
+    border: "1px solid #2a2d3e",
+    borderRadius: "8px",
+    color: "#f1f5f9",
+  };
+
   // JSX
   return (
     <>
-      {/* Project selector */}
-      <select
-        id="project-select"
-        value={selectedProject?.name ?? ""}
-        onChange={(e) =>
-          setSelectedProject(projects.find((p) => p.name === e.target.value))
-        }
-      >
-        <option value="" disabled hidden>
-          Choose a project...
-        </option>
-        {projects.map((project) => (
-          <option key={project.id} value={project.name}>
-            {project.name}
-          </option>
-        ))}
-      </select>
-
-      {/* Topic selector */}
-      {selectedProject && (
+      <h1 className="text-white text-2xl font-bold mb-6">Analytics</h1>
+      <div className="flex gap-4 mb-6">
+        {/* Project selector */}
         <select
-          id="topic-selector"
-          value={selectedTopic?.title}
+          className={selectClass}
+          id="project-select"
+          value={selectedProject?.name ?? ""}
           onChange={(e) =>
-            setSelectedTopic(topics.find((t) => t.title === e.target.value))
+            setSelectedProject(projects.find((p) => p.name === e.target.value))
           }
         >
-          <option value="">Choose a topic...</option>
-          {topics.map((topic) => (
-            <option key={topic.id} value={topic.title}>
-              {topic.title}
+          <option value="" disabled hidden>
+            Choose a project...
+          </option>
+          {projects.map((project) => (
+            <option key={project.id} value={project.name}>
+              {project.name}
             </option>
           ))}
         </select>
-      )}
+        {/* Topic selector */}
+        {selectedProject && (
+          <select
+            className={selectClass}
+            id="topic-selector"
+            value={selectedTopic?.title}
+            onChange={(e) =>
+              setSelectedTopic(topics.find((t) => t.title === e.target.value))
+            }
+          >
+            <option value="">Choose a topic...</option>
+            {topics.map((topic) => (
+              <option key={topic.id} value={topic.title}>
+                {topic.title}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
       {/* Sentiment breakdown per topic */}
       {/* Pie chart showing posts' sentiment counts for selected topic */}
-      {selectedTopic && (
-        <PieChart width={400} height={400}>
-          <Pie
-            data={sentimentCounts}
-            dataKey="count"
-            nameKey="sentiment"
-            label={({ sentiment, count }) => `${sentiment}: ${count}`}
-          >
-            {sentimentCounts.map((entry) => (
-              <Cell
-                key={`cell-${entry.sentiment}`}
-                fill={COLORS[entry.sentiment] || "#8884d8"}
-              />
-            ))}
-          </Pie>
-          <Legend />
-        </PieChart>
+      {selectedTopic && sentimentCounts.length > 0 && (
+        <div className={cardClass}>
+          <h2 className="text-white text-lg font-semibold mb-4">
+            Sentiment Breakdown — {selectedTopic.title}
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <PieChart>
+              <Pie
+                data={sentimentCounts}
+                dataKey="count"
+                nameKey="sentiment"
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
+                label={({ sentiment, count }) => `${sentiment}: ${count}`}
+              >
+                {sentimentCounts.map((entry) => (
+                  <Cell
+                    key={`cell-${entry.sentiment}`}
+                    fill={SENTIMENT_COLORS[entry.sentiment] || "#8884d8"}
+                  />
+                ))}
+              </Pie>
+              {/* <Tooltip contentStyle={tooltipStyle} /> */}
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
       )}
 
       {/* Sentiment over time */}
       {/* Line chart showing sentiment trends across time for a topic */}
-      {selectedTopic && (
-        <LineChart data={[...sentimentTimeline]} width={500} height={300}>
-          <XAxis dataKey="date" />
-          <YAxis />
-          <Legend />
-          <Line
-            dataKey="positive"
-            stroke="#22c55e"
-            strokeWidth={2}
-            name="Positive"
-          />
-          <Line
-            dataKey="neutral"
-            stroke="#94a3b8"
-            strokeWidth={2}
-            name="Neutral"
-          />
-          <Line
-            dataKey="negative"
-            stroke="#ef4444"
-            strokeWidth={2}
-            name="Negative"
-          />
-        </LineChart>
+      {selectedTopic && sentimentTimeline.length > 0 && (
+        <div className={cardClass}>
+          <h2 className="text-white text-lg font-semibold mb-4">
+            Sentiment Over Time — {selectedTopic.title}
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={[...sentimentTimeline]} width={500} height={300}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2d3e" />
+              <XAxis
+                dataKey="date"
+                stroke="#64748b"
+                tick={{ fill: "#64748b", fontSize: 12 }}
+              />
+              <YAxis
+                stroke="#64748b"
+                tick={{ fill: "#64748b", fontSize: 12 }}
+              />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 13 }} />
+
+              <Line
+                type="monotone"
+                dataKey="positive"
+                stroke={SENTIMENT_COLORS.positive}
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="neutral"
+                stroke={SENTIMENT_COLORS.neutral}
+                strokeWidth={2}
+              />
+              <Line
+                type="monotone"
+                dataKey="negative"
+                stroke={SENTIMENT_COLORS.negative}
+                strokeWidth={2}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       )}
 
       {/* Experiment conversion rates */}
       {/* Bar chart comparing control vs. treatment conversion rates across experiments for a project */}
-      {selectedProject && (
-        <BarChart data={conversionRates} width={500} height={300}>
-          <XAxis dataKey="title" />
-          <YAxis />
-          <Legend />
-          <Bar dataKey="control" fill="#AEC6CF" name="Control" />
-          <Bar dataKey="treatment" fill="#CFB7AE" name="Treatment" />
-        </BarChart>
+      {selectedProject && conversionRates.length > 0 && (
+        <div className={cardClass}>
+          <h2 className="text-white text-lg font-semibold mb-4">
+            Experiment Conversion Rates
+          </h2>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={conversionRates}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2d3e" />
+              <XAxis
+                dataKey="title"
+                stroke="#64748b"
+                tick={{ fill: "#64748b", fontSize: 12 }}
+              />
+              <YAxis
+                stroke="#64748b"
+                tick={{ fill: "#64748b", fontSize: 12 }}
+              />
+              <Tooltip contentStyle={tooltipStyle} />
+              <Legend wrapperStyle={{ fontSize: 13 }} />
+              <Bar dataKey="control" fill="#64748b" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="treatment" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      )}
+      {selectedTopic && sentimentCounts.length === 0 && (
+        <p className="text-[#64748b]">No posts found for this topic yet.</p>
       )}
     </>
   );

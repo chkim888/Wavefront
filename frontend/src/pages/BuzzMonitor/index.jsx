@@ -57,51 +57,71 @@ function BuzzMonitor() {
   return (
     // JSX for the buzz monitor page
     <>
-      {/* project selector */}
-      <select
-        id="project-select"
-        value={selectedProject?.name ?? ""}
-        onChange={(e) =>
-          setSelectedProject(projects.find((p) => p.name === e.target.value))
-        }
-      >
-        <option value="" disabled hidden>
-          Choose a project...
-        </option>
-        {projects.map((project) => (
-          <option key={project.id} value={project.name}>
-            {project.name}
-          </option>
-        ))}
-      </select>
-
-      {/* topic selector */}
-      {selectedProject && (
+      <h1 className="text-white text-2xl font-bold mb-6">Buzz Monitor</h1>
+      <div className="flex gap-4 mb-6">
+        {/* project selector */}
         <select
-          id="topic-select"
-          value={selectedTopic?.title ?? ""}
+          className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2"
+          id="project-select"
+          value={selectedProject?.name ?? ""}
           onChange={(e) =>
-            setSelectedTopic(topics.find((t) => t.title === e.target.value))
+            setSelectedProject(projects.find((p) => p.name === e.target.value))
           }
         >
           <option value="" disabled hidden>
-            Choose a topic...
+            Choose a project...
           </option>
-          {topics.map((topic) => (
-            <option key={topic.id} value={topic.title}>
-              {topic.title}
+          {projects.map((project) => (
+            <option key={project.id} value={project.name}>
+              {project.name}
             </option>
           ))}
         </select>
-      )}
+
+        {/* topic selector */}
+        {selectedProject && (
+          <select
+            className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2"
+            id="topic-select"
+            value={selectedTopic?.title ?? ""}
+            onChange={(e) =>
+              setSelectedTopic(topics.find((t) => t.title === e.target.value))
+            }
+          >
+            <option value="" disabled hidden>
+              Choose a topic...
+            </option>
+            {topics.map((topic) => (
+              <option key={topic.id} value={topic.title}>
+                {topic.title}
+              </option>
+            ))}
+          </select>
+        )}
+      </div>
 
       {/* posts list */}
       {selectedTopic && (
         <ul>
           {posts.map((post) => (
-            <li key={post.id}>
-              <span>{post.content}</span>
-              <span>{post.sentiment_label}</span>
+            <li
+              key={post.id}
+              className="bg-[#1e2130] border border-[#2a2d3e] rounded-lg p-4 mb-3"
+            >
+              <div className="flex justify-between items-center">
+                <span>{post.content}</span>
+                <span
+                  className={
+                    post.sentiment_label === "positive"
+                      ? "text-green-400"
+                      : post.sentiment_label === "negative"
+                        ? "text-red-400"
+                        : "text-gray-400"
+                  }
+                >
+                  {post.sentiment_label}
+                </span>
+              </div>
             </li>
           ))}
         </ul>

@@ -10,7 +10,7 @@ function Alerts() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [topics, setTopics] = useState([]);
-
+  
   // for websocket
   const newAlert = useWebSocket(selectedProject?.id);
   useEffect(() => {
@@ -48,55 +48,76 @@ function Alerts() {
     fetch();
   }, [selectedProject]);
 
-  // JSX
+  // For coloring
+  const selectClass =
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1]";
+  const cardClass = "bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6";
+
   return (
     <>
       {/* Project selector */}
-      <select
-        value={selectedProject?.name ?? ""}
-        onChange={(e) => {
-          setSelectedProject(projects.find((p) => p.name === e.target.value));
-        }}
-      >
-        <option value="" disabled hidden>
-          Choose a project...
-        </option>
-        {projects.map((project) => (
-          <option key={project.id} value={project.name}>
-            {project.name}
+      <h1 className="text-white text-2xl font-bold mb-6">Alerts</h1>
+
+      <div className="mb-6">
+        <select
+          className={selectClass}
+          value={selectedProject?.name ?? ""}
+          onChange={(e) => {
+            setSelectedProject(projects.find((p) => p.name === e.target.value));
+          }}
+        >
+          <option value="" disabled hidden>
+            Choose a project...
           </option>
-        ))}
-      </select>
+          {projects.map((project) => (
+            <option key={project.id} value={project.name}>
+              {project.name}
+            </option>
+          ))}
+        </select>
+      </div>
 
       {/* A list of alerts */}
       {selectedProject && (
-        <>
-          <table>
-            <thead>
-              <tr>
+        <div className={cardClass}>
+          {alerts.length === 0 ? (
+            <p className="text-[#64748b]">No alerts for this project yet.</p>
+          ) : (
+            <table className="w-full text-sm">
+              <thead>
                 {/* topic, time, message */}
-                <th>Topic</th>
-                <th>Time</th>
-                <th>Message</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Maps one row per alert */}
-              {alerts.map((alert) => {
-                const topic = topics.find((t) => t.id === alert.topic_id);
-                return (
-                  <tr key={alert.id}>
-                    <td>{topic?.title}</td>
-                    <td>{alert.triggered_at}</td>
-                    <td>{alert.message}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </>
+                <tr className="text-[#64748b] border-b border-[#2a2d3e]">
+                  <th className="text-left py-2 font-normal">Topic</th>
+                  <th className="text-left py-2 font-normal">Time</th>
+                  <th className="text-left py-2 font-normal">Message</th>
+                </tr>
+              </thead>
+              <tbody className="text-white">
+                {/* Maps one row per alert */}
+                {alerts.map((alert, index) => {
+                  const topic = topics.find((t) => t.id === alert.topic_id);
+                  return (
+                    <tr
+                      key={alert.id ?? index}
+                      className="border-b border-[#2a2d3e]"
+                    >
+                      <td className="py-3 text-[#a5b4fc]">
+                        {topic?.title ?? "—"}
+                      </td>
+                      <td className="py-3 text-[#64748b]">
+                        {new Date(alert.triggered_at).toLocaleString()}
+                      </td>
+                      <td className="py-3">{alert.message}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          )}
+        </div>
       )}
     </>
   );
 }
+
 export default Alerts;
