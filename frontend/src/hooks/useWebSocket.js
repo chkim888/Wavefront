@@ -6,16 +6,22 @@ export function useWebSocket(projectId) {
 
   // connect to the websocket backend endpoint on load
   useEffect(() => {
+    // do not define websocket if projectId not valid
+    if (!projectId) return;
+
     // set up websocket connection
     const ws = new WebSocket(`ws://localhost:8000/ws/${projectId}`);
 
     // listen for incoming messages
-    ws.addEventListener("message", (event) => {
+    const handleMessage = (event) => {
       setAlert(JSON.parse(event.data));
-    });
+    };
+    ws.addEventListener("message", handleMessage);
 
     // close the connection
     return () => {
+      // remove event listener on closing
+      ws.removeEventListener("message", handleMessage);
       ws.close();
     };
   }, [projectId]);

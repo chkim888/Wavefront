@@ -58,10 +58,10 @@ function BuzzMonitor() {
     // JSX for the buzz monitor page
     <>
       <h1 className="text-white text-2xl font-bold mb-6">Buzz Monitor</h1>
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* project selector */}
         <select
-          className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2"
+          className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 w-full md:w-auto"
           id="project-select"
           value={selectedProject?.name ?? ""}
           onChange={(e) =>
@@ -81,7 +81,7 @@ function BuzzMonitor() {
         {/* topic selector */}
         {selectedProject && (
           <select
-            className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2"
+            className="bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 w-full md:w-auto"
             id="topic-select"
             value={selectedTopic?.title ?? ""}
             onChange={(e) =>

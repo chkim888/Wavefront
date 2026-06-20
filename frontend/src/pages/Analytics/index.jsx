@@ -143,7 +143,7 @@ function Analytics() {
 
   // for styling
   const selectClass =
-    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1]";
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1] w-full md:w-auto";
   const cardClass = "bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 mb-6";
 
   const tooltipStyle = {
@@ -157,7 +157,7 @@ function Analytics() {
   return (
     <>
       <h1 className="text-white text-2xl font-bold mb-6">Analytics</h1>
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col md:flex-row gap-4 mb-6">
         {/* Project selector */}
         <select
           className={selectClass}
