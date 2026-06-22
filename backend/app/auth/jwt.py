@@ -6,7 +6,7 @@ from fastapi import HTTPException, status
 from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 
 # Loading env variables
-load_dotenv()
+load_dotenv(override=False)
 SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
 JWT_EXPIRY_MINUTES = int(os.getenv("JWT_EXPIRY_MINUTES"))

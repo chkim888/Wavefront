@@ -4,7 +4,7 @@ from celery import Celery
 from celery.schedules import crontab
 
 # Imported env variable
-load_dotenv()
+load_dotenv(override=False)
 REDIS_URL = os.getenv("REDIS_URL")
 
 # Create a Celery instance using Redis as broker

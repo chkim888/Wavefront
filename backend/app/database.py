@@ -8,7 +8,7 @@ class Base(DeclarativeBase):
     pass # No logic needs to exist -- class is just to be inherited from
 
 # Load DATABASE_URL from .env
-load_dotenv()
+load_dotenv(override=False)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 # Create engine using that URL

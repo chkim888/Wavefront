@@ -13,7 +13,7 @@ from app.models.user import *
 import os
 from dotenv import load_dotenv
 
-load_dotenv()
+load_dotenv(override=False)
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

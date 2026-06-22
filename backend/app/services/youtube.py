@@ -8,7 +8,7 @@ from app.services.sentiment import sentiment_analysis
 from app.constants import MAX_RESULTS
 
 # Load env variables
-load_dotenv()
+load_dotenv(override=False)
 YOUTUBE_API_KEY = os.getenv("YOUTUBE_API_KEY")
 
 # Ingest youtube data -- the whole process
