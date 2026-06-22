@@ -26,6 +26,20 @@ origins = [
     frontend_url,
     LOCAL_FRONTEND_URL
 ]
+
+# Trying cleaning frontend URL
+raw_frontend_url = os.getenv("FRONTEND_URL")
+print(f"RAW FRONTEND URL BEFORE CLEANING: f{raw_frontend_url}")
+if raw_frontend_url:
+    # Aggressively remove hidden trailing/leading quotes, spaces, and slashes
+    clean_url = raw_frontend_url.strip().replace('"', '').replace("'", "").rstrip('/')
+    origins.append(clean_url)
+    
+    # Also add the www. version just in case your browser flips between them
+    if "://www." not in clean_url:
+        origins.append(clean_url.replace("://", "://www."))
+print(f"--- DEBUG PRODUCTION CORS ORIGINS DETECTED: {origins} ---")
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins, 
