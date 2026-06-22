@@ -96,6 +96,9 @@ CREATE TABLE posts ( -- streamlined event data
 		ON DELETE CASCADE	
 );
 
+CREATE INDEX ix_posts_topic_id 
+ON posts (topic_id);
+
 CREATE TABLE alerts (
 	id UUID PRIMARY KEY,
 	project_id UUID NOT NULL,
@@ -113,6 +116,9 @@ CREATE TABLE alerts (
 		REFERENCES topics(id) 
 		ON DELETE CASCADE
 );
+
+CREATE INDEX ix_alerts_project_triggered 
+ON alerts (project_id, triggered_at DESC);
 
 CREATE TABLE experiments ( -- experiments for A/B testing
 	id UUID PRIMARY KEY,

@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Mapped, mapped_column
-from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, CheckConstraint, UUID
+from sqlalchemy import DateTime, ForeignKey, UniqueConstraint, CheckConstraint, UUID, Index, text
 from typing import Optional
 from uuid import UUID as PyUUID, uuid4
 from datetime import datetime
@@ -19,7 +19,7 @@ class Keyword(Base):
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
     topic_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.id"))
-    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("topics.project_id"))
+    project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id"))
     keyword: Mapped[str] = mapped_column()
 
     __table_args__ = (
@@ -42,6 +42,7 @@ class Post(Base):
     __tablename__ = "posts"
     __table_args__ = (
         UniqueConstraint('platform_id', 'external_id', name='uq_platform_external'),
+        Index('ix_posts_topic_id', 'topic_id'),
     )
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key=True, default=uuid4)
@@ -61,6 +62,9 @@ class Post(Base):
 
 class Alert(Base):
     __tablename__ = "alerts"
+    __table_args__ = (
+        Index('ix_alerts_project_triggered', 'project_id', text('triggered_at DESC')),
+    )
 
     id: Mapped[PyUUID] = mapped_column(UUID, primary_key= True, default=uuid4)
     project_id: Mapped[PyUUID] = mapped_column(ForeignKey("projects.id")) 
