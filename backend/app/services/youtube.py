@@ -108,26 +108,28 @@ def get_video_metadata(video_ids: list[str]):
     youtube = get_youtube_client() # get youtube service object
     metadata = list()
     # Configure & send request for specified video IDs
-    request = youtube.videos().list(
-        part="snippet,statistics",
-        id=",".join(video_ids)
-    )
-    response = request.execute()
-    # Create a dictionary for each response & append to result
-    for data in response['items']:
-        snippet = data.get("snippet", {})
-        stats = data.get("statistics", {}) 
-        new_metadata = dict(
-            external_id=data.get("id"),
-            original_poster=snippet.get("channelId"),
-            posted_time=snippet.get("publishedAt"),
-            content_type="video",
-            content=snippet.get("title", "") + "\n\n" + snippet.get("description", ""),
-            view_count=stats.get("viewCount", 0),
-            like_count=stats.get("likeCount", 0),
-            comment_count=stats.get("commentCount", 0)
+    for i in range(0, len(video_ids), 50):
+        batch = video_ids[i:i+50]
+        request = youtube.videos().list(
+            part="snippet,statistics",
+            id=",".join(batch)
         )
-        metadata.append(new_metadata)
+        response = request.execute()
+        # Create a dictionary for each response & append to result
+        for data in response['items']:
+            snippet = data.get("snippet", {})
+            stats = data.get("statistics", {}) 
+            new_metadata = dict(
+                external_id=data.get("id"),
+                original_poster=snippet.get("channelId"),
+                posted_time=snippet.get("publishedAt"),
+                content_type="video",
+                content=snippet.get("title", "") + "\n\n" + snippet.get("description", ""),
+                view_count=stats.get("viewCount", 0),
+                like_count=stats.get("likeCount", 0),
+                comment_count=stats.get("commentCount", 0)
+            )
+            metadata.append(new_metadata)
     return metadata
 
 # Fetch comments for a single video
