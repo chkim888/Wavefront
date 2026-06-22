@@ -3,9 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import asyncio
 import json
+import os
 import redis.asyncio as aioredis
 from uuid import UUID
-from app.constants import REDIS_HOST, REDIS_PORT
+from app.constants import REDIS_HOST, REDIS_PORT, LOCAL_FRONTEND_URL
 from app.routers import auth, users, projects, topics, experiments, ingest, assignments, events, flags, alerts
 
 # Background task that starts when the app starts & subscribe to Redis channels
@@ -16,6 +17,9 @@ async def lifespan(app: FastAPI):
     
 # Initialize the main web app object -- this orchestrates the entire API
 app = FastAPI(lifespan=lifespan)
+
+# Read frontend URL from Railway's environment
+frontend_url = os.getenv("FRONTEND_URL", LOCAL_FRONTEND_URL)
 
 ### routers
 app.include_router(auth.router)
@@ -30,9 +34,14 @@ app.include_router(flags.router)
 app.include_router(alerts.router)
 
 # Configuring CORS -- set to accept all requests for development
+origins = [
+    frontend_url,
+    LOCAL_FRONTEND_URL
+]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], 
+    allow_origins=origins, 
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
