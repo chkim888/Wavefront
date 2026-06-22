@@ -21,18 +21,6 @@ app = FastAPI(lifespan=lifespan)
 # Read frontend URL from Railway's environment
 frontend_url = os.getenv("FRONTEND_URL", LOCAL_FRONTEND_URL)
 
-### routers
-app.include_router(auth.router)
-app.include_router(users.router)
-app.include_router(projects.router)
-app.include_router(topics.router)
-app.include_router(experiments.router)
-app.include_router(ingest.router)
-app.include_router(assignments.router)
-app.include_router(events.router)
-app.include_router(flags.router)
-app.include_router(alerts.router)
-
 # Configuring CORS -- set to accept all requests for development
 origins = [
     frontend_url,
@@ -45,6 +33,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+### routers
+app.include_router(auth.router)
+app.include_router(users.router)
+app.include_router(projects.router)
+app.include_router(topics.router)
+app.include_router(experiments.router)
+app.include_router(ingest.router)
+app.include_router(assignments.router)
+app.include_router(events.router)
+app.include_router(flags.router)
+app.include_router(alerts.router)
 
 # test endpoint -- just to see if things work
 @app.get("/")
