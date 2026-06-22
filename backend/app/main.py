@@ -101,10 +101,23 @@ async def websocket_endpoint(websocket: WebSocket, project_id: UUID):
 async def redis_listener():
     try:
         # Fetch from Railway or generate for local
+        redis_host = os.getenv("REDISHOST")
+        redis_port = os.getenv("REDISPORT")
+        redis_pass = os.getenv("REDISPASSWORD")
+        # for locals
+        if not redis_host:
+            redis_host = REDIS_HOST
+            redis_port = REDIS_PORT
+            redis_pass = None
+        if redis_host and "railway.internal" in redis_host:
+            redis_host = "redis"
+        print(f"--- DEBUG CONNECTING TO REDIS AT: {redis_host}")
         redis_url = os.getenv("REDIS_URL", f"redis://{REDIS_HOST}:{REDIS_PORT}/0")
         # connect to Redis
-        r = aioredis.Redis.from_url(
-            redis_url,
+        r = aioredis.Redis(
+            host=redis_host,
+            port=int(redis_port) if redis_port else 6379,
+            password=redis_pass if redis_pass else None,
             encoding="utf-8",
             decode_responses=True
         )
