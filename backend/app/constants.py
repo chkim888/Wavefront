@@ -1,4 +1,5 @@
 # Initializing constants
+import os
 
 # Role
 OWNER = "owner"
@@ -38,8 +39,8 @@ CONTROL = "control"
 TREATMENT = "treatment"
 
 
-# Redis local
-REDIS_URL = "redis://localhost:6379"
+# Redis URL
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
 
 # Local
 LOCAL_FRONTEND_URL = "http://localhost:5173"
