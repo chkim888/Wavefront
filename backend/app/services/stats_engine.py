@@ -96,6 +96,8 @@ def calculate_rates(assignment_counts, conversion_counts):
 
 # Calculate lift (percentage improvement)
 def calculate_lift(treatment_rate, control_rate):
+    if control_rate == 0:
+        return None
     lift = round(((treatment_rate - control_rate) / control_rate), 3)
     return lift
 

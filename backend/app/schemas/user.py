@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, EmailStr
 from typing import Optional, Literal
 from uuid import UUID
 from datetime import datetime
@@ -8,7 +8,7 @@ class UserBase(BaseModel): # Base class for User type
     username: str
 
 class UserRegister(UserBase): # When new user is created
-    email: str
+    email: EmailStr
     password: str
 
 class UserLogin(UserBase):
@@ -21,7 +21,7 @@ class UserResponse(UserBase): # What user gets in return
 
 class UserUpdate(UserBase):
     username: Optional[str] = None
-    email: Optional[str] = None
+    email: Optional[EmailStr] = None
 
 ## Project
 class ProjectBase(BaseModel):
