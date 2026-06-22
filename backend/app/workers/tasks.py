@@ -1,5 +1,5 @@
 from sqlalchemy import select
-from googleapiclient.errors import HttpError
+# from googleapiclient.errors import HttpError
 from celery import chain
 from app.workers.celery_app import app
 from app.services.youtube import ingest_youtube_data
@@ -41,6 +41,7 @@ def schedule_ingestion():
 # Define task for ingestion
 @app.task(bind=True, max_retries=3, default_retry_delay=60)
 def ingestion_task(self, topic_id: str, project_id: str, platform_id: str, keywords: list[str]):
+    from googleapiclient.errors import HttpError
     db_session = SessionLocal()
     try:
         ingest_youtube_data(topic_id, project_id, platform_id, keywords, db_session)

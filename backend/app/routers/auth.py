@@ -56,11 +56,5 @@ def login(user: UserLogin, db_session = Depends(get_db_session)):
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="User password does not match the record"
         )
-    '''
-    Temporarily added for debugging
-    '''
-    print("LOGIN START")
-    print("DB USER:", db_user)
-    print("CREATING TOKEN")
     # user validation successful -- return JWT
     return {"access_token": create_access_token(db_user.id), "token_type": "bearer"}

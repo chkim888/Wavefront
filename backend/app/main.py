@@ -111,7 +111,6 @@ async def redis_listener():
     while True:    
         try:
             redis_url = os.getenv("REDIS_URL") or REDIS_URL
-            print("REDIS_URL:", os.getenv("REDIS_URL"))
             # connect to Redis
             r = aioredis.Redis.from_url(
                 redis_url,
