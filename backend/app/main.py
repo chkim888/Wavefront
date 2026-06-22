@@ -117,6 +117,9 @@ async def redis_listener():
                 redis_url,
                 encoding="utf-8",
                 decode_responses=True,
+                socket_timeout=30,
+                socket_connect_timeout=30,
+                socket_keepalive=True,
             )
             
             # subscribe to a pattern
