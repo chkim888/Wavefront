@@ -47,10 +47,13 @@ def clean_post_data(content: str):
     content = re.sub(r'\n+', ' ', content)      # collapse newlines
     content = re.sub(r' +', ' ', content)       # collapse spaces
     content = content.lower()                   # lowercase
-    return content[:512].strip()
+    return content
 
 # Call the huggingface sentiment analysis pipeline & update posts
 def run_sentiment_analysis(content: str, post: Post, pipeline):
-    sentiment = pipeline(content)
-    post.sentiment_label = sentiment[0]["label"]
-    post.sentiment_score = sentiment[0]["score"]
+    try:
+        sentiment = pipeline(content, truncation=True, max_length=512)
+        post.sentiment_label = sentiment[0]["label"]
+        post.sentiment_score = sentiment[0]["score"]
+    except Exception as e:
+        print(f"Skipping post {post.id}: {e}")
