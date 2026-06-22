@@ -6,7 +6,7 @@ import json
 import os
 import redis.asyncio as aioredis
 from uuid import UUID
-from app.constants import REDIS_HOST, REDIS_PORT, LOCAL_FRONTEND_URL, REDIS_URL
+from app.constants import LOCAL_FRONTEND_URL, REDIS_URL
 from app.routers import auth, users, projects, topics, experiments, ingest, assignments, events, flags, alerts
 
 # Background task that starts when the app starts & subscribe to Redis channels
