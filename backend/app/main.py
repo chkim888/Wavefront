@@ -56,6 +56,12 @@ def test():
 def health_check():
     return {"status": "ok"}
 
+@app.post("/trigger-ingestion")
+def trigger_ingestion():
+    from app.workers.tasks import schedule_ingestion
+    schedule_ingestion.delay()
+    return {"status": "ingestion triggered"}
+
 '''
 WebSocket stuff below
 '''
