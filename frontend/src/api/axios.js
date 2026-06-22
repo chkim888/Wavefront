@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create an Axios instance
 const authFetch = axios.create({
-  baseURL: `${import.meta.env.VITE_API_URL}/api`, // configured in vite.config.js
+  baseURL: `${import.meta.env.VITE_API_URL}`, // configured in vite.config.js
   headers: {
     Accept: "application/json",
   },
