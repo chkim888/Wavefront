@@ -13,6 +13,8 @@ JWT_EXPIRY_MINUTES = int(os.getenv("JWT_EXPIRY_MINUTES"))
 
 # Takes a payload & returns a signed JWT string
 def create_access_token(user_id):
+    print("JWT_SECRET exists:", bool(SECRET_KEY))
+    print("JWT_EXPIRY_MINUTES:", JWT_EXPIRY_MINUTES)
     expiry = datetime.utcnow() + timedelta(minutes=int(JWT_EXPIRY_MINUTES))
     payload = {
         "user_id": str(user_id),

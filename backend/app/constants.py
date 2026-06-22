@@ -1,6 +1,4 @@
 # Initializing constants
-from urllib.parse import urlparse
-import os
 
 # Role
 OWNER = "owner"
@@ -39,11 +37,9 @@ INSUFFICIENT_DATA = "insufficient data"
 CONTROL = "control"
 TREATMENT = "treatment"
 
-# Redis
-REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
-_parsed_redis = urlparse(REDIS_URL)
-REDIS_HOST = _parsed_redis.hostname
-REDIS_PORT = _parsed_redis.port or 6379
+# Redis local
+REDIS_HOST = "localhost"
+REDIS_PORT = 6379
 
 # Local
 LOCAL_FRONTEND_URL = "http://localhost:5173"

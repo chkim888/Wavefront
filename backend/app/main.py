@@ -75,7 +75,13 @@ class ConnectionManager:
     # Removes a WebSocket connection from the list
     def disconnect(self, websocket: WebSocket, project_id: UUID):
         if project_id in self.connections:
-            self.connections[project_id].remove(websocket)
+            try:
+                self.connections[project_id].remove(websocket)
+            except ValueError:
+                pass
+
+            if not self.connections[project_id]:
+                del self.connections[project_id]
     
     # Sends a message to all connections watching a specific project
     async def broadcast(self, project_id: UUID, message):
@@ -97,7 +103,7 @@ async def websocket_endpoint(websocket: WebSocket, project_id: UUID):
     try: 
         while True:
             data = await websocket.receive_text()
-    except:
+    except Exception:
         manager.disconnect(websocket, project_id)
 
 # Redis listener
@@ -123,37 +129,17 @@ async def redis_listener():
             redis_url,
             encoding="utf-8",
             decode_responses=True,
-            socket_timeout=2.0,
-            socket_connect_timeout=2.0
         )
         
         # subscribe to a pattern
         async with r.pubsub() as pubsub:
             await pubsub.psubscribe("alerts:*")
-            while True:
-                try:
-                    # Non-blocking poll: yields execution control back to Uvicorn for HTTP requests
-                    message = await pubsub.get_message(ignore_subscribe_messages=True, timeout=1.0)
-                    
-                    if message and message.get("type") == "pmessage":
-                        channel = message.get("channel", "")
-                        parts = channel.split(":")
-                        
-                        if len(parts) >= 2:
-                            project_id_str = parts[1]
-                            raw_data = message.get("data")
-                            
-                            if raw_data:
-                                data = json.loads(raw_data)
-                                target_uuid = UUID(project_id_str)
-                                await manager.broadcast(target_uuid, json.dumps(data))
-                                
-                except asyncio.TimeoutError:
-                    # Quiet period check: sleep momentarily to avoid high CPU spin locks
-                    await asyncio.sleep(0.1)
-                except Exception as loop_err:
-                    print(f"--- Redis Loop Warning: {loop_err} ---")
-                    await asyncio.sleep(5)
-                    
+            # loop waiting for messages
+            async for message in pubsub.listen():
+                if message["type"] == "pmessage":
+                    data = json.loads(message["data"])
+                    channel = message["channel"]
+                    project_id = channel.split(":")[1]
+                    await manager.broadcast(UUID(project_id), json.dumps(data))
     except Exception as e:
-        print(f"--- Fatal Redis Initialization Crash: {e} ---")
+        print(e)
