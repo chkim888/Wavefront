@@ -71,7 +71,7 @@ function BuzzMonitor() {
           <option value="" disabled hidden>
             Choose a project...
           </option>
-          {projects.map((project) => (
+          {projects?.map((project) => (
             <option key={project.id} value={project.name}>
               {project.name}
             </option>
@@ -91,7 +91,7 @@ function BuzzMonitor() {
             <option value="" disabled hidden>
               Choose a topic...
             </option>
-            {topics.map((topic) => (
+            {topics?.map((topic) => (
               <option key={topic.id} value={topic.title}>
                 {topic.title}
               </option>
@@ -103,7 +103,7 @@ function BuzzMonitor() {
       {/* posts list */}
       {selectedTopic && (
         <ul>
-          {posts.map((post) => (
+          {posts?.map((post) => (
             <li
               key={post.id}
               className="bg-[#1e2130] border border-[#2a2d3e] rounded-lg p-4 mb-3"

@@ -46,6 +46,13 @@ try:
     platform_id = db_session.scalars(
         select(Platform).where(Platform.name == "youtube")
     ).first()
+    if not platform_id:
+        new_platform = Platform(
+            name="youtube",
+        )
+        db_session.add(new_platform)
+        db_session.flush()
+        platform_id = new_platform.id
     platform = db_session.scalars(
         insert(Project_Platform).values(
             project_id=demo_project.id,

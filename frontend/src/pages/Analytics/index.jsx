@@ -101,7 +101,7 @@ function Analytics() {
       counts[sentiment] = (counts[sentiment] || 0) + 1;
       return counts;
     }, {});
-    return Object.entries(aggregated).map(([sentiment, count]) => ({
+    return Object.entries(aggregated)?.map(([sentiment, count]) => ({
       sentiment,
       count,
     }));
@@ -170,7 +170,7 @@ function Analytics() {
           <option value="" disabled hidden>
             Choose a project...
           </option>
-          {projects.map((project) => (
+          {projects?.map((project) => (
             <option key={project.id} value={project.name}>
               {project.name}
             </option>
@@ -187,7 +187,7 @@ function Analytics() {
             }
           >
             <option value="">Choose a topic...</option>
-            {topics.map((topic) => (
+            {topics?.map((topic) => (
               <option key={topic.id} value={topic.title}>
                 {topic.title}
               </option>
@@ -214,7 +214,7 @@ function Analytics() {
                 outerRadius={100}
                 label={({ sentiment, count }) => `${sentiment}: ${count}`}
               >
-                {sentimentCounts.map((entry) => (
+                {sentimentCounts?.map((entry) => (
                   <Cell
                     key={`cell-${entry.sentiment}`}
                     fill={SENTIMENT_COLORS[entry.sentiment] || "#8884d8"}

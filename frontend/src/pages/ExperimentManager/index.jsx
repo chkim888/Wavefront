@@ -171,7 +171,7 @@ function ExperimentManager() {
           <option value="" disabled hidden>
             Choose a project...
           </option>
-          {projects.map((project) => (
+          {projects?.map((project) => (
             <option key={project.id} value={project.name}>
               {project.name}
             </option>
@@ -193,7 +193,7 @@ function ExperimentManager() {
             <option value="" disabled hidden>
               Choose an experiment...
             </option>
-            {experiments.map((experiment) => (
+            {experiments?.map((experiment) => (
               <option key={experiment.id} value={experiment.title}>
                 {experiment.title}
               </option>

@@ -69,7 +69,7 @@ function Alerts() {
           <option value="" disabled hidden>
             Choose a project...
           </option>
-          {projects.map((project) => (
+          {projects?.map((project) => (
             <option key={project.id} value={project.name}>
               {project.name}
             </option>
@@ -94,7 +94,7 @@ function Alerts() {
               </thead>
               <tbody className="text-white">
                 {/* Maps one row per alert */}
-                {alerts.map((alert, index) => {
+                {alerts?.map((alert, index) => {
                   const topic = topics.find((t) => t.id === alert.topic_id);
                   return (
                     <tr
