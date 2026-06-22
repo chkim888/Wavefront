@@ -6,7 +6,7 @@ import json
 import os
 import redis.asyncio as aioredis
 from uuid import UUID
-from app.constants import REDIS_HOST, REDIS_PORT, LOCAL_FRONTEND_URL
+from app.constants import REDIS_HOST, REDIS_PORT, LOCAL_FRONTEND_URL, REDIS_URL
 from app.routers import auth, users, projects, topics, experiments, ingest, assignments, events, flags, alerts
 
 # Background task that starts when the app starts & subscribe to Redis channels
@@ -90,7 +90,7 @@ class ConnectionManager:
             try:
                 await ws.send_text(message)
             except Exception:
-                pass
+                continue
 
 # Instantiate the WebSocket connection manager
 manager = ConnectionManager()
@@ -108,38 +108,35 @@ async def websocket_endpoint(websocket: WebSocket, project_id: UUID):
 
 # Redis listener
 async def redis_listener():
-    try:
-        # Fetch from Railway or generate for local
-        redis_host = os.getenv("REDISHOST", REDIS_HOST)
-        redis_port = os.getenv("REDISPORT", REDIS_PORT)
-        redis_pass = os.getenv("REDISPASSWORD", None)
-        
-        if redis_host and "railway.internal" in redis_host: # Safeguard
-            redis_host = "redis"
+    while True:    
+        try:
+            redis_url = os.getenv("REDIS_URL") or REDIS_URL
+            print("REDIS_URL:", os.getenv("REDIS_URL"))
+            # connect to Redis
+            r = aioredis.Redis.from_url(
+                redis_url,
+                encoding="utf-8",
+                decode_responses=True,
+            )
             
-        if redis_pass: # Deployment
-            redis_url = f"redis://default:{redis_pass}@{redis_host}:{redis_port}/0"
-        else: # Local development fallback
-            redis_url = f"redis://{redis_host}:{redis_port}/0"
-
-        print(f"--- DEBUG CONNECTING TO REDIS VIA URL: redis://***@{redis_host}:{redis_port}/0 ---")
-
-        # connect to Redis
-        r = aioredis.Redis.from_url(
-            redis_url,
-            encoding="utf-8",
-            decode_responses=True,
-        )
-        
-        # subscribe to a pattern
-        async with r.pubsub() as pubsub:
-            await pubsub.psubscribe("alerts:*")
-            # loop waiting for messages
-            async for message in pubsub.listen():
-                if message["type"] == "pmessage":
-                    data = json.loads(message["data"])
+            # subscribe to a pattern
+            async with r.pubsub() as pubsub:
+                await pubsub.psubscribe("alerts:*")
+                # loop waiting for messages
+                async for message in pubsub.listen():
+                    if message["type"] != "pmessage":
+                        continue
+                    try:
+                        data = json.loads(message["data"])
+                    except Exception:
+                        continue
                     channel = message["channel"]
                     project_id = channel.split(":")[1]
-                    await manager.broadcast(UUID(project_id), json.dumps(data))
-    except Exception as e:
-        print(e)
+                    try:
+                        project_uuid = UUID(project_id)
+                    except Exception:
+                        continue
+                    await manager.broadcast(project_uuid, json.dumps(data))
+        except Exception as e:
+            print("Redis listener error:", e)
+            await asyncio.sleep(5)

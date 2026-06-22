@@ -37,9 +37,9 @@ INSUFFICIENT_DATA = "insufficient data"
 CONTROL = "control"
 TREATMENT = "treatment"
 
+
 # Redis local
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_URL = "redis://localhost:6379"
 
 # Local
 LOCAL_FRONTEND_URL = "http://localhost:5173"
