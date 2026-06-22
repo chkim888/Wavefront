@@ -1,4 +1,6 @@
 # Initializing constants
+from urllib.parse import urlparse
+import os
 
 # Role
 OWNER = "owner"
@@ -17,7 +19,7 @@ MODEL = "cardiffnlp/twitter-roberta-base-sentiment-latest"
 SENTIMENT_ANALYSIS = "sentiment-analysis"
 
 # YouTube
-MAX_RESULTS = 10
+MAX_RESULTS = 50
 
 # Spike detection
 HOURS = 24
@@ -38,5 +40,7 @@ CONTROL = "control"
 TREATMENT = "treatment"
 
 # Redis
-REDIS_HOST = "localhost"
-REDIS_PORT = 6379
+REDIS_URL = os.environ.get("REDIS_URL", "redis://localhost:6379")
+_parsed_redis = urlparse(REDIS_URL)
+REDIS_HOST = _parsed_redis.hostname
+REDIS_PORT = _parsed_redis.port or 6379

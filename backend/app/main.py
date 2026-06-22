@@ -42,6 +42,10 @@ app.add_middleware(
 def test():
     return {"message": "hello"}
 
+@app.get("/health")
+def health_check():
+    return {"status": "ok"}
+
 '''
 WebSocket stuff below
 '''

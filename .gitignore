@@ -1,4 +1,5 @@
 .env
+frontend/.env
 venv/
 
 # Ignoring all python bytecode across the project

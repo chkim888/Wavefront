@@ -10,8 +10,8 @@ export function useWebSocket(projectId) {
     if (!projectId) return;
 
     // set up websocket connection
-    const ws = new WebSocket(`ws://localhost:8000/ws/${projectId}`);
-
+    const ws = new WebSocket(`${import.meta.env.VITE_WS_URL}/ws/${projectId}`);
+    
     // listen for incoming messages
     const handleMessage = (event) => {
       setAlert(JSON.parse(event.data));
