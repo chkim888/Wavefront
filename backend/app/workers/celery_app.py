@@ -8,7 +8,7 @@ load_dotenv()
 REDIS_URL = os.getenv("REDIS_URL")
 
 # Create a Celery instance using Redis as broker
-app = Celery("wavefront", broker=REDIS_URL, include=['app.workers.tasks'])
+app = Celery("wavefront", broker=REDIS_URL)
 
 # Initializing beat (periodic task scheduler)
 app.conf.beat_schedule = {
