@@ -9,7 +9,7 @@ from jwt.exceptions import ExpiredSignatureError, InvalidTokenError
 load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")
 JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
-JWT_EXPIRY_MINUTES = os.getenv("JWT_EXPIRY_MINUTES")
+JWT_EXPIRY_MINUTES = int(os.getenv("JWT_EXPIRY_MINUTES"))
 
 # Takes a payload & returns a signed JWT string
 def create_access_token(user_id):
