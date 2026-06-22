@@ -1,10 +1,11 @@
 from sqlalchemy import select, func, and_
 import redis
 import json
+import os
 import statistics
 from datetime import datetime, timezone, timedelta
 from app.models.buzz_monitor import Post, Alert
-from app.constants import HOURS, REDIS_HOST, REDIS_PORT
+from app.constants import HOURS, REDIS_URL
 
 # Performs spike detection assessment on a given topic
 def spike_detection(topic_id: str, project_id: str, db_session) -> bool:
@@ -38,7 +39,8 @@ def spike_detection(topic_id: str, project_id: str, db_session) -> bool:
         db_session.add(alert)
         db_session.commit()
         # Publishing the newly-created alert to a Redis channel
-        r = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+        redis_url = os.getenv("REDIS_URL") or REDIS_URL
+        r = redis.from_url(redis_url)
         r.publish(f"alerts:{project_id}", json.dumps({
             "topic_id": str(topic_id),
             "message": alert.message,
