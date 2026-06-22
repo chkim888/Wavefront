@@ -27,19 +27,6 @@ origins = [
     LOCAL_FRONTEND_URL
 ]
 
-# Trying cleaning frontend URL
-raw_frontend_url = os.getenv("FRONTEND_URL")
-print(f"RAW FRONTEND URL BEFORE CLEANING: f{raw_frontend_url}")
-if raw_frontend_url:
-    # Aggressively remove hidden trailing/leading quotes, spaces, and slashes
-    clean_url = raw_frontend_url.strip().replace('"', '').replace("'", "").rstrip('/')
-    origins.append(clean_url)
-    
-    # Also add the www. version just in case your browser flips between them
-    if "://www." not in clean_url:
-        origins.append(clean_url.replace("://", "://www."))
-print(f"--- DEBUG PRODUCTION CORS ORIGINS DETECTED: {origins} ---")
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins, 
@@ -113,12 +100,11 @@ async def websocket_endpoint(websocket: WebSocket, project_id: UUID):
 # Redis listener
 async def redis_listener():
     try:
+        # Fetch from Railway or generate for local
+        redis_url = os.getenv("REDIS_URL", f"redis://{REDIS_HOST}:{REDIS_PORT}/0")
         # connect to Redis
-        r = aioredis.Redis(
-            host=REDIS_HOST,
-            port=REDIS_PORT,
-            db=0,
-            password=None,
+        r = aioredis.Redis.from_url(
+            redis_url,
             encoding="utf-8",
             decode_responses=True
         )
