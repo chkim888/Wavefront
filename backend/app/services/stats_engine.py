@@ -71,10 +71,14 @@ def get_results(experiment_id, assignment_counts, conversion_counts, db_session)
         lift = calculate_lift(treatment_rate, control_rate)
         # perform chi-square test
         _, p_value, _, _ = perform_chi_square_test(assignment_counts, conversion_counts)
-        # calculate statistical confidence
-        confidence = round(float((1 - p_value) * 100), 3)
-        # determine winner
-        winner = determine_winner(confidence, treatment_rate, control_rate)
+        if p_value:
+            # calculate statistical confidence
+            confidence = round(float((1 - p_value) * 100), 3)
+            # determine winner
+            winner = determine_winner(confidence, treatment_rate, control_rate)
+        else:
+            confidence = None
+            winner = INSUFFICIENT_DATA
         # insert result into the database
         new_result = dict(
             experiment_id=experiment_id,
@@ -110,6 +114,19 @@ def perform_chi_square_test(assignment_counts, conversion_counts):
     control_total = assignment_counts[CONTROL]
     control_success = conversion_counts[CONTROL]
     control_failure = control_total - control_success
+
+    '''
+    Checks for 0's
+    '''
+    # Check if an entire group has 0
+    if treatment_total == 0 or control_total == 0:
+        return None, None, None, None
+    # Check if there are zero overall conversions or failures
+    total_conversions = treatment_success + control_success
+    total_failures = treatment_failure + control_failure
+    if total_conversions == 0 or total_failures == 0:
+        return None, None, None, None
+
     # Build the 2x2 contingency table
     table = np.array([
         [treatment_success, treatment_failure],
