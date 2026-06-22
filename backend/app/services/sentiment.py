@@ -1,12 +1,21 @@
 import re
 from uuid import UUID
 from sqlalchemy import select, and_
-from transformers import pipeline
 from app.models.buzz_monitor import Post
-from app.constants import MODEL, SENTIMENT_ANALYSIS
+from app.constants import SENTIMENT_ANALYSIS
+
+try:
+    from transformers import pipeline
+    from app.constants import MODEL
+    TRANSFORMERS_AVAILABLE = True
+except ImportError:
+    TRANSFORMERS_AVAILABLE = False
 
 # Takes a topic & runs sentiment analysis on all associated posts
 def sentiment_analysis(topic_id, db_session):
+    if not TRANSFORMERS_AVAILABLE:
+        print("Transformers not available; skipping sentiment analysis")
+        return
     # fetch relevant posts from database
     posts = fetch_posts(topic_id, db_session)
     # Initialize the huggingface pipeline
