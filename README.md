@@ -42,8 +42,27 @@ Storytelling shapes our perception of ourselves, other people, and the world aro
 
 Wavefront runs four services in production: a FastAPI HTTP server, a Celery worker for async ingestion and NLP, Celery Beat for scheduled ingestion, and a React frontend. Redis serves as both the Celery broker and the Pub/Sub channel for WebSocket alert delivery.
 
+#### **Data flow:**
+1. Celery Beat triggers ingestion hourly per active topic
+2. Worker fetches videos and comments from YouTube Data API v3
+3. HuggingFace RoBERTa scores each post for sentiment (positive / neutral / negative)
+4. Spike detection computes z-scores against rolling volume baseline & alerts published to Redis Pub/Sub on spike
+5. FastAPI lifespan task subscribes to Redis and broadcasts alerts to connected WebSocket clients in real time
+
+
 **_Full system design document coming soon!_**
 
+
+## Future Work
+
+- **Production-scale ingestion** — swap Celery Beat for Kafka to handle higher-volume, multi-platform data streams without quota ceiling constraints
+- **Multi-platform support** — extend ingestion beyond YouTube to Reddit, X/Twitter, and TikTok
+- **Deployed sentiment inference** — move RoBERTa scoring into the deployed Celery pipeline (currently running locally) using a lightweight CPU-optimized model
+- **Real load testing** — rerun Locust against the deployed Railway instance under realistic concurrent load
+- **CI/CD pipeline** — automated testing and deployment on push to main via GitHub Actions
+- **Expanded A/B testing** — multi-variant experiments (beyond binary control/treatment), sequential testing, and automatic stopping rules
+
+---
 
 ## Local Setup
 
