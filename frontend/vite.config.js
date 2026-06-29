@@ -13,9 +13,9 @@ export default defineConfig({
         rewrite: (path) => path.replace(/^\/api/, ""),
       },
     },
-    fs: {
-      strict: false
-    },
+    // fs: {
+    //   strict: false
+    // },
   },
   resolve: {
     alias: {
