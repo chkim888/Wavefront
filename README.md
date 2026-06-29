@@ -6,9 +6,15 @@ Wavefront is a full-stack, interactive A/B testing and social intelligence SaaS 
     
 Teams can use Wavefront to track real-time audience sentiment across social media platforms, run statistically rigorous A/B tests on their product features, and get instant alerts when public interest spikes so they can act on momentum. 
 
-### Demo Video
-_**Still working on it — check back in a few weeks!**_
+**_Demo video: (link coming soon)_**
 
+<br>
+
+<p align="center">
+    <kbd>
+        <img width=60% alt="wavefront-gif" src="https://github.com/user-attachments/assets/07c45c27-f74e-464d-8d7b-838c67d2fa72" />
+    </kbd>
+</p>
 
 ---
 
