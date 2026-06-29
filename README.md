@@ -12,7 +12,7 @@ Teams can use Wavefront to track real-time audience sentiment across social medi
 
 <p align="center">
     <kbd>
-        <img width=60% alt="wavefront-gif" src="https://github.com/user-attachments/assets/07c45c27-f74e-464d-8d7b-838c67d2fa72" />
+        <img width=90% alt="wavefront-gif" src="https://github.com/user-attachments/assets/07c45c27-f74e-464d-8d7b-838c67d2fa72" />
     </kbd>
 </p>
 
