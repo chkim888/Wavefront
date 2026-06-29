@@ -35,7 +35,7 @@ function Layout() {
       <aside
         className={`
           fixed md:static inset-y-0 left-0 z-50
-          w-60 bg-[#1a1d27] flex flex-col p-6 pt-20 md:pt-6 border-r border-[#2a2d3e]
+          w-60 bg-gradient-to-b from-[#1a1d27] to-[#13111f] flex flex-col p-6 pt-20 md:pt-6 border-r border-[#252838]
           transform transition-transform duration-200
           ${drawerOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"}
         `}
@@ -47,8 +47,8 @@ function Layout() {
             to="/alerts"
             className={({ isActive }) =>
               isActive
-                ? "text-white bg-[#2a2d3e] px-4 py-2 rounded-lg"
-                : "text-[#64748b] hover:text-white hover:bg-[#2a2d3e] px-4 py-2 rounded-lg transition-colors"
+                ? "text-white bg-[#252838] px-4 py-2 rounded-lg shadow-[0_0_12px_rgba(49,20,120,0.9)]"
+                : "text-[#64748b] hover:text-white hover:bg-[#252838] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] px-4 py-2 rounded-lg transition-all"
             }
           >
             Alerts
@@ -57,8 +57,8 @@ function Layout() {
             to="/analytics"
             className={({ isActive }) =>
               isActive
-                ? "text-white bg-[#2a2d3e] px-4 py-2 rounded-lg"
-                : "text-[#64748b] hover:text-white hover:bg-[#2a2d3e] px-4 py-2 rounded-lg transition-colors"
+                ? "text-white bg-[#252838] px-4 py-2 rounded-lg shadow-[0_0_12px_rgba(49,20,120,0.9)]"
+                : "text-[#64748b] hover:text-white hover:bg-[#252838] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] px-4 py-2 rounded-lg transition-all"
             }
           >
             Analytics
@@ -67,8 +67,8 @@ function Layout() {
             to="/buzz"
             className={({ isActive }) =>
               isActive
-                ? "text-white bg-[#2a2d3e] px-4 py-2 rounded-lg"
-                : "text-[#64748b] hover:text-white hover:bg-[#2a2d3e] px-4 py-2 rounded-lg transition-colors"
+                ? "text-white bg-[#252838] px-4 py-2 rounded-lg shadow-[0_0_12px_rgba(49,20,120,0.9)]"
+                : "text-[#64748b] hover:text-white hover:bg-[#252838] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] px-4 py-2 rounded-lg transition-all"
             }
           >
             Buzz Monitor
@@ -77,8 +77,8 @@ function Layout() {
             to="/manage"
             className={({ isActive }) =>
               isActive
-                ? "text-white bg-[#2a2d3e] px-4 py-2 rounded-lg"
-                : "text-[#64748b] hover:text-white hover:bg-[#2a2d3e] px-4 py-2 rounded-lg transition-colors"
+                ? "text-white bg-[#252838] px-4 py-2 rounded-lg shadow-[0_0_12px_rgba(49,20,120,0.9)]"
+                : "text-[#64748b] hover:text-white hover:bg-[#252838] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] px-4 py-2 rounded-lg transition-all"
             }
           >
             Experiment Manager

@@ -143,8 +143,8 @@ function Analytics() {
 
   // for styling
   const selectClass =
-    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1] w-full md:w-auto";
-  const cardClass = "bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 mb-6";
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#7c3aed] w-full md:w-auto";
+  const cardClass = "card p-6 mb-6";
 
   const tooltipStyle = {
     backgroundColor: "#1e2130",
@@ -274,7 +274,7 @@ function Analytics() {
 
       {/* Experiment conversion rates */}
       {/* Bar chart comparing control vs. treatment conversion rates across experiments for a project */}
-      {selectedProject && conversionRates.length > 0 && (
+      {selectedProject && !selectedTopic && conversionRates.length > 0 && (
         <div className={cardClass}>
           <h2 className="text-white text-lg font-semibold mb-4">
             Experiment Conversion Rates
@@ -294,7 +294,7 @@ function Analytics() {
               <Tooltip contentStyle={tooltipStyle} />
               <Legend wrapperStyle={{ fontSize: 13 }} />
               <Bar dataKey="control" fill="#64748b" radius={[4, 4, 0, 0]} />
-              <Bar dataKey="treatment" fill="#6366f1" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="treatment" fill="#7c3aed" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

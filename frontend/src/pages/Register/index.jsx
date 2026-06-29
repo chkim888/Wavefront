@@ -32,13 +32,13 @@ function Register() {
   // return JSX
   return (
     <div className="min-h-screen bg-[#0f1117] flex items-center justify-center">
-      <div className="bg-[#1e2130] p-8 rounded-xl border border-[#2a2d3e] w-full max-w-md">
+      <div className="card p-8 w-full max-w-md">
         <h1 className="text-white text-2xl font-bold mb-6">Wavefront</h1>
         <form onSubmit={handleSubmit}>
           <label className="block text-[#64748b] text-sm mb-1">
             Email:
             <input
-              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#6366f1]"
+              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#7c3aed]"
               type="email"
               name="email"
               value={email}
@@ -48,7 +48,7 @@ function Register() {
           <label className="block text-[#64748b] text-sm mb-1">
             Username:
             <input
-              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#6366f1]"
+              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#7c3aed]"
               type="text"
               name="username"
               value={username}
@@ -58,7 +58,7 @@ function Register() {
           <label className="block text-[#64748b] text-sm mb-1">
             Password:
             <input
-              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#6366f1]"
+              className="w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 mb-4 focus:outline-none focus:border-[#7c3aed]"
               type="password"
               name="password"
               value={password}
@@ -66,7 +66,7 @@ function Register() {
             />
           </label>
           <button
-            className="w-full bg-[#6366f1] text-white py-2 rounded-lg hover:bg-[#4f46e5] active:scale-95 cursor-pointer transition-colors"
+            className="w-full bg-[#7c3aed] text-white py-2 rounded-lg hover:bg-[#6d28d9] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] active:scale-95 cursor-pointer transition-all"
             type="submit"
           >
             Register
@@ -76,7 +76,7 @@ function Register() {
           <p className="text-[#64748b] text-sm text-center mt-4">
             Already have an account?
           </p>
-          <Link className="text-[#6366f1] text-sm hover:underline" to="/login">
+          <Link className="text-[#7c3aed] text-sm hover:underline" to="/login">
             Login here
           </Link>
         </div>

@@ -143,14 +143,14 @@ function ExperimentManager() {
 
   // for styling
   const selectClass =
-    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1] w-full md:w-auto";
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#7c3aed] w-full md:w-auto";
   const inputClass =
-    "w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1]";
+    "w-full bg-[#0f1117] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#7c3aed]";
   const labelClass = "block text-[#64748b] text-sm mb-1";
 
   const statusColors = {
     CREATED: "bg-gray-500/20 text-gray-300",
-    RUNNING: "bg-[#6366f1]/20 text-[#a5b4fc]",
+    RUNNING: "bg-[#7c3aed]/20 text-[#c4b5fd]",
     COMPLETE: "bg-green-500/20 text-green-400",
   };
 
@@ -208,7 +208,7 @@ function ExperimentManager() {
               setShowForm(true);
               setSelectedExperiment(null);
             }}
-            className="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] active:scale-95 cursor-pointer transition-colors ml-auto"
+            className="bg-[#7c3aed] text-white px-4 py-2 rounded-lg hover:bg-[#6d28d9] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] active:scale-95 cursor-pointer transition-all ml-auto"
           >
             Create a New Experiment
           </button>
@@ -217,10 +217,7 @@ function ExperimentManager() {
 
       {/* Experiment creation form */}
       {showForm && (
-        <form
-          onSubmit={handleSubmit}
-          className="bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 mb-6 max-w-lg"
-        >
+        <form onSubmit={handleSubmit} className="card p-6 mb-6 max-w-lg">
           <h2 className="text-white text-lg font-semibold mb-4">
             New Experiment
           </h2>
@@ -268,7 +265,7 @@ function ExperimentManager() {
           <div className="flex gap-3">
             <button
               type="submit"
-              className="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] active:scale-95 cursor-pointer transition-colors"
+              className="bg-[#7c3aed] text-white px-4 py-2 rounded-lg hover:bg-[#6d28d9] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] active:scale-95 cursor-pointer transition-all"
             >
               Create Experiment
             </button>
@@ -285,7 +282,7 @@ function ExperimentManager() {
 
       {/* start & stop experiment button */}
       {selectedExperiment && (
-        <div className="bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 mb-6 max-w-lg">
+        <div className="card p-6 mb-6 max-w-lg">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-white text-lg font-semibold">
               {selectedExperiment.title}
@@ -301,7 +298,7 @@ function ExperimentManager() {
           </p>
           <button
             onClick={toggleExperiment}
-            className="bg-[#6366f1] text-white px-4 py-2 rounded-lg hover:bg-[#4f46e5] active:scale-95 cursor-pointer transition-colors"
+            className="bg-[#7c3aed] text-white px-4 py-2 rounded-lg hover:bg-[#6d28d9] hover:shadow-[0_0_16px_rgba(124,58,237,0.4)] active:scale-95 cursor-pointer transition-all"
           >
             {selectedExperiment.curr_status === RUNNING && "Stop"}
             {selectedExperiment.curr_status === CREATED && "Start"}
@@ -312,7 +309,7 @@ function ExperimentManager() {
 
       {/* Result view */}
       {selectedExperiment?.curr_status === COMPLETE && (
-        <div className="bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6 max-w-lg">
+        <div className="card p-6 mb-6 max-w-lg">
           <h2 className="text-white text-lg font-semibold mb-4">
             Experiment Result
           </h2>

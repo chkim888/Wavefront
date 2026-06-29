@@ -10,7 +10,7 @@ function Alerts() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [alerts, setAlerts] = useState([]);
   const [topics, setTopics] = useState([]);
-  
+
   // for websocket
   const newAlert = useWebSocket(selectedProject?.id);
   useEffect(() => {
@@ -50,8 +50,8 @@ function Alerts() {
 
   // For coloring
   const selectClass =
-    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#6366f1] w-full md:w-auto";
-  const cardClass = "bg-[#1e2130] border border-[#2a2d3e] rounded-xl p-6";
+    "bg-[#1e2130] border border-[#2a2d3e] text-white rounded-lg px-4 py-2 focus:outline-none focus:border-[#7c3aed] w-full md:w-auto";
+  const cardClass = "card p-6 mb-6";
 
   return (
     <>
@@ -101,7 +101,7 @@ function Alerts() {
                       key={alert.id ?? index}
                       className="border-b border-[#2a2d3e]"
                     >
-                      <td className="py-3 text-[#a5b4fc]">
+                      <td className="py-3 text-[#c4b5fd]">
                         {topic?.title ?? "—"}
                       </td>
                       <td className="py-3 text-[#64748b]">
