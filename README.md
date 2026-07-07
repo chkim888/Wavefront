@@ -48,15 +48,14 @@ Storytelling shapes our perception of ourselves, other people, and the world aro
 
 Wavefront runs four services in production: a FastAPI HTTP server, a Celery worker for async ingestion and NLP, Celery Beat for scheduled ingestion, and a React frontend. Redis serves as both the Celery broker and the Pub/Sub channel for WebSocket alert delivery.
 
+[**Systems Design Document**](https://docs.google.com/document/d/1GZ63APBnN_2ABCZ3iRIxO1mTfbWUktKIkhUQa8AjleI/edit?usp=sharing)
+
 #### **Data flow:**
 1. Celery Beat triggers ingestion hourly per active topic
 2. Worker fetches videos and comments from YouTube Data API v3
 3. HuggingFace RoBERTa scores each post for sentiment (positive / neutral / negative)
 4. Spike detection computes z-scores against rolling volume baseline & alerts published to Redis Pub/Sub on spike
 5. FastAPI lifespan task subscribes to Redis and broadcasts alerts to connected WebSocket clients in real time
-
-
-**_Full system design document coming soon!_**
 
 
 ## Future Work
