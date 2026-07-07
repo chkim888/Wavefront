@@ -57,7 +57,7 @@ Wavefront runs four services in production: a FastAPI HTTP server, a Celery work
 4. Spike detection computes z-scores against rolling volume baseline & alerts published to Redis Pub/Sub on spike
 5. FastAPI lifespan task subscribes to Redis and broadcasts alerts to connected WebSocket clients in real time
 
-
+ 
 ## Future Work
 
 - **Production-scale ingestion** — swap Celery Beat for Kafka to handle higher-volume, multi-platform data streams without quota ceiling constraints
