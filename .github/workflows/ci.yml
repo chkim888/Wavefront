@@ -47,6 +47,12 @@ jobs:
       - name: Install dependencies
         working-directory: backend
         run: pip install -r requirements.txt
+        
+      - name: Run migrations
+        working-directory: backend
+        env:
+          DATABASE_URL: postgresql://test_user:test_password@localhost:5432/wavefront_test
+        run: alembic upgrade head
 
       - name: Run smoke test
         working-directory: backend
