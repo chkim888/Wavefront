@@ -60,4 +60,4 @@ jobs:
           POSTGRES_DB: wavefront_test
           POSTGRES_USER: test_user
           POSTGRES_PASSWORD: test_password
-        run: pytest tests/test_smoke.py -v
+        run: PYTHONPATH=. pytest tests/test_smoke.py -v
