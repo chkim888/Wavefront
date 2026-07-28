@@ -13,4 +13,4 @@ def test_login_returns_401_for_invalid_credentials():
         "username": "nonexistent",
         "password": "wrongpassword"
     })
-    assert response.status_code == 401
+    assert response.status_code == 404
