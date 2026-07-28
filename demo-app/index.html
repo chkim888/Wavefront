@@ -62,6 +62,7 @@
         // Set a new session ID if there is no value set yet
         if (!sessionId) {
             sessionId = localStorage.setItem('streamo-session-id', crypto.randomUUID());
+            sessionId = localStorage.getItem('streamo-session-id');
         }
         return sessionId;
     }
